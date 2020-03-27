@@ -24,9 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Operations.ApiClient\Operations.ApiClient.csproj" />
     <ProjectReference Include="..\..\src\Operations.ApiContract\Operations.ApiContract.csproj" />
-    <ProjectReference Include="..\..\src\Operations.Common\Operations.Common.csproj" />
     <ProjectReference Include="..\..\src\Operations.MessagingContract\Operations.MessagingContract.csproj" />
-    <ProjectReference Include="..\..\src\Operations.Worker\Operations.Worker.csproj" />
     <ProjectReference Include="..\..\src\Operations\Operations.csproj" />
   </ItemGroup>
 

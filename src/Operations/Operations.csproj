@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Swisschain.Exchange.Operations</AssemblyName>
     <UserSecretsId>b9c62c92-0e8d-4ffd-9813-7a9f046e43ed</UserSecretsId>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,17 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="6.2.2" />
-    <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="6.2.2" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Swisschain.Sdk.Server" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Operations.Common\Operations.Common.csproj" />
     <ProjectReference Include="..\Operations.ApiContract\Operations.ApiContract.csproj" />
   </ItemGroup>
 
