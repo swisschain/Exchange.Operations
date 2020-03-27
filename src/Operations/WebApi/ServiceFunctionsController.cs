@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Operations.WebApi
 {
+    [Authorize]
     [ApiController]
     [Route("api/service-functions")]
     public class ServiceFunctionsController : ControllerBase
