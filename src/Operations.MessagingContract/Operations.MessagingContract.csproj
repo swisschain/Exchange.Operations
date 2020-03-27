@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>Swisschain.Exchange.Operations.MessagingContract</AssemblyName>
+    <PackageId>Swisschain.Exchange.Operations.MessagingContract</PackageId>
+    <RootNamespace>Swisschain.Exchange.Operations.MessagingContract</RootNamespace>
+    <Authors>Swisschain</Authors>
+    <Product>Exchange</Product>
+  </PropertyGroup>
+
+</Project>

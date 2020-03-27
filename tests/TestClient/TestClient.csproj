@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>Exchange.Operations.TestClient</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Operations.ApiClient\Operations.ApiClient.csproj" />
+    <ProjectReference Include="..\..\src\Operations.ApiContract\Operations.ApiContract.csproj" />
+  </ItemGroup>
+
+</Project>

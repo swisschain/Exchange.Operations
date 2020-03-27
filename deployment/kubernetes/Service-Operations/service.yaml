@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: operations
+    environment: Development
+  name: operations
+  namespace: exchange
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 5000
+  - name: grpc
+    port: 80
+    protocol: TCP
+    targetPort: 5001
+  selector:
+    app: operations
+  sessionAffinity: None
+  type: ClusterIP
