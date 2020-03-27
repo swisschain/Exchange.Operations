@@ -22,9 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Operations.ApiClient\Operations.ApiClient.csproj" />
-    <ProjectReference Include="..\..\src\Operations.ApiContract\Operations.ApiContract.csproj" />
-    <ProjectReference Include="..\..\src\Operations.MessagingContract\Operations.MessagingContract.csproj" />
     <ProjectReference Include="..\..\src\Operations\Operations.csproj" />
   </ItemGroup>
 

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Operations.Configuration;
-using Operations.GrpcServices;
 using Swisschain.Sdk.Server.Common;
 
 namespace Operations
@@ -24,8 +23,6 @@ namespace Operations
         protected override void RegisterEndpoints(IEndpointRouteBuilder endpoints)
         {
             base.RegisterEndpoints(endpoints);
-
-            endpoints.MapGrpcService<MonitoringService>();
         }
     }
 }
