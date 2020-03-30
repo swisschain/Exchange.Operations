@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Autofac;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Operations.Configuration;
+using Operations.Modules;
 using Swisschain.Sdk.Server.Common;
 
 namespace Operations
@@ -63,9 +65,9 @@ namespace Operations
             });
         }
 
-        protected override void RegisterEndpoints(IEndpointRouteBuilder endpoints)
+        protected override void ConfigureContainerExt(ContainerBuilder builder)
         {
-            base.RegisterEndpoints(endpoints);
+            builder.RegisterModule(new ServiceModule(Config));
         }
     }
 }

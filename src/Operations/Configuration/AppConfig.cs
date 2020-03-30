@@ -2,11 +2,7 @@
 {
     public class AppConfig
     {
+        public MatchingEngineSettings MatchingEngine { get; set; }
         public JwtSettings Jwt { get; set; }
-    }
-
-    public class JwtSettings
-    {
-        public string Secret { get; set; }
     }
 }

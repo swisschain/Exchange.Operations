@@ -22,6 +22,11 @@
 
   <ItemGroup>
     <PackageReference Include="Swisschain.Sdk.Server" Version="3.0.1" />
+    <PackageReference Include="Swisschain.MatchingEngine.Client" Version="0.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Operations.DomainService\Operations.DomainService.csproj" />
   </ItemGroup>
 
   <ItemGroup>
