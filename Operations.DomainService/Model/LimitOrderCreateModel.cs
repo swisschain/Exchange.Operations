@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Operations.DomainService.Model
@@ -8,6 +9,12 @@ namespace Operations.DomainService.Model
     /// </summary>
     public class LimitOrderCreateModel
     {
+        /// <summary>
+        /// (Optional) Unique ID of limit order.
+        /// In case if LimitOrderId is null then ID will auto-generated.
+        /// </summary>
+        public Guid? LimitOrderId { get; set; }
+
         /// <summary>
         /// The asset pair identifier.
         /// </summary>
@@ -35,7 +42,7 @@ namespace Operations.DomainService.Model
         public LimitOrderType Type { get; set; }
 
         /// <summary>
-        /// If <c>true</c> previously created limit orders will be closed.
+        /// If <c>true</c> and LimitOrderID is set then previously created limit orders will be closed.
         /// </summary>
         public bool CancelPrevious { get; set; }
     }

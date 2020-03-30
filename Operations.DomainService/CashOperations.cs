@@ -15,12 +15,12 @@ namespace Operations.DomainService
 
         public async Task CashInAsync(CashOperationModel model)
         {
-            await _matchingEngineClient.CashOperations.CashInAsync(model.WalletId, model.AssetId, model.Amount);
+            await _matchingEngineClient.CashOperations.CashInAsync(model.ClientId, model.AssetId, model.Amount);
         }
 
         public async Task CashOutAsync(CashOperationModel model)
         {
-            await _matchingEngineClient.CashOperations.CashOutAsync(model.WalletId, model.AssetId, model.Amount);
+            await _matchingEngineClient.CashOperations.CashOutAsync(model.ClientId, model.AssetId, model.Amount);
         }
     }
 }
