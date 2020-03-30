@@ -12,7 +12,7 @@ namespace Operations
     {
         private sealed class RemoteSettingsConfig
         {
-            public IReadOnlyCollection<string> RemoteSettingsUrls { get; set; } = Array.Empty<string>();
+            public IReadOnlyCollection<string> RemoteSettingsUrls { get; set; }
         }
 
         public static void Main(string[] args)
