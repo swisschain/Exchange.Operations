@@ -28,6 +28,10 @@ namespace Operations.Modules
                 .As<ILimitOrderOperations>()
                 .SingleInstance();
 
+            builder.RegisterType<MarketOrderOperations>()
+                .As<IMarketOrderOperations>()
+                .SingleInstance();
+
             builder.RegisterType<CashOperations>()
                 .As<ICashOperations>()
                 .SingleInstance();

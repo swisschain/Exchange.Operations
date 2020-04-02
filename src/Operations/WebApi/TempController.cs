@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MatchingEngine.Client;
+using MatchingEngine.Client.Contracts.Balances;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,9 @@ namespace Operations.WebApi
         [HttpGet("balance/{walletId}")]
         public async Task<IActionResult> GetBalance([FromRoute] string walletId)
         {
-            var balances = await _matchingEngineClient.Balances.GetAllAsync(walletId);
+            BalancesGetAllRequest request = new BalancesGetAllRequest { WalletId = walletId };
+
+            BalancesGetAllResponse balances = await _matchingEngineClient.Balances.GetAllAsync(request);
 
             return Ok(balances);
         }

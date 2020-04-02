@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Globalization;
+using System.Threading.Tasks;
 using MatchingEngine.Client;
+using MatchingEngine.Client.Contracts.Incoming;
 using Operations.DomainService.Model;
 
 namespace Operations.DomainService
@@ -15,12 +17,26 @@ namespace Operations.DomainService
 
         public async Task CashInAsync(CashOperationModel model)
         {
-            await _matchingEngineClient.CashOperations.CashInAsync(model.ClientId, model.AssetId, model.Amount);
+            CashInOutOperation request = new CashInOutOperation
+            {
+                WalletId = model.ClientId,
+                AssetId = model.AssetId,
+                Volume = model.Amount.ToString(CultureInfo.InvariantCulture)
+            };
+
+            await _matchingEngineClient.CashOperations.CashInOutAsync(request);
         }
 
         public async Task CashOutAsync(CashOperationModel model)
         {
-            await _matchingEngineClient.CashOperations.CashOutAsync(model.ClientId, model.AssetId, model.Amount);
+            CashInOutOperation request = new CashInOutOperation
+            {
+                WalletId = model.ClientId,
+                AssetId = model.AssetId,
+                Volume = (-model.Amount).ToString(CultureInfo.InvariantCulture)
+            };
+
+            await _matchingEngineClient.CashOperations.CashInOutAsync(request);
         }
     }
 }

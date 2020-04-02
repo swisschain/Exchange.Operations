@@ -6,8 +6,8 @@ namespace Operations.DomainService
 {
     public interface ILimitOrderOperations
     {
-        Task<LimitOrderResponse> CreateAsync(LimitOrderCreateModel model);
+        Task<OperationResponse> CreateAsync(LimitOrderCreateModel model);
 
-        Task CancelAsync(Guid limitOrderId);
+        Task<OperationResponse> CancelAsync(Guid limitOrderId);
     }
 }

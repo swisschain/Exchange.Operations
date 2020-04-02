@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
+using Google.Protobuf.WellKnownTypes;
 using MatchingEngine.Client;
+using MatchingEngine.Client.Contracts.Incoming;
 using Operations.DomainService.Model;
 
 namespace Operations.DomainService
@@ -14,32 +17,34 @@ namespace Operations.DomainService
             _matchingEngineClient = matchingEngineClient;
         }
 
-        public async Task<LimitOrderResponse> CreateAsync(LimitOrderCreateModel model)
+        public async Task<OperationResponse> CreateAsync(LimitOrderCreateModel model)
         {
+            LimitOrder request = new LimitOrder
+            {
+                WalletId = model.WalletId,
+                AssetPairId = model.AssetPairId,
+                CancelAllPreviousLimitOrders = model.CancelPrevious,
+                Price = model.Price.ToString(CultureInfo.InvariantCulture),
+                Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
+                Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
+            };
 
+            var response = await _matchingEngineClient.Trading.CreateLimitOrderAsync(request);
 
-            var result = await _matchingEngineClient.Trading.CreateLimitOrderAsync(
-                new MatchingEngine.Client.Models.Trading.LimitOrderRequestModel
-                {
-                    Id = Guid.NewGuid(),
-                    AssetPairId = model.AssetPairId,
-                    Price = model.Price,
-                    Volume = model.Type == LimitOrderType.Sell
-                        ? -model.Volume
-                        : model.Volume,
-                    WalletId = model.WalletId,
-                    CancelAllPreviousLimitOrders = model.CancelPrevious,
-                    Timestamp = DateTime.UtcNow
-                });
+            var result = new OperationResponse(response);
 
-            var response = new LimitOrderResponse { Id = result.Id, Status = result.Status, Reason = result.Reason };
-
-            return response;
+            return result;
         }
 
-        public async Task CancelAsync(Guid limitOrderId)
+        public async Task<OperationResponse> CancelAsync(Guid limitOrderId)
         {
-            await _matchingEngineClient.Trading.CancelLimitOrderAsync(limitOrderId);
+            LimitOrderCancel request = new LimitOrderCancel { Uid = limitOrderId.ToString() };
+
+            var response = await _matchingEngineClient.Trading.CancelLimitOrderAsync(request);
+
+            var result = new OperationResponse(response);
+
+            return result;
         }
     }
 }

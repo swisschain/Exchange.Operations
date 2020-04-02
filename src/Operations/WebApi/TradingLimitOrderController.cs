@@ -21,7 +21,7 @@ namespace Operations.WebApi
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(LimitOrderResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateAsync([FromBody] LimitOrderCreateModel model)
         {
             var result = await _limitOrderOperations.CreateAsync(model);

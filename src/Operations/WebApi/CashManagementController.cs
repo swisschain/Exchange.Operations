@@ -33,7 +33,5 @@ namespace Operations.WebApi
 
             return NoContent();
         }
-
-
     }
 }
