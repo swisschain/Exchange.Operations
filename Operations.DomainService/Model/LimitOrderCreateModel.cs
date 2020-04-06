@@ -39,7 +39,7 @@ namespace Operations.DomainService.Model
         /// The limit order type.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public LimitOrderType Type { get; set; }
+        public OrderType Type { get; set; }
 
         /// <summary>
         /// If <c>true</c> and LimitOrderID is set then previously created limit orders will be closed.

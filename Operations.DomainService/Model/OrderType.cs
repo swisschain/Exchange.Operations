@@ -3,7 +3,7 @@
     /// <summary>
     /// Specifies a limit order type.
     /// </summary>
-    public enum LimitOrderType
+    public enum OrderType
     {
         /// <summary>
         /// Unspecified limit order type.

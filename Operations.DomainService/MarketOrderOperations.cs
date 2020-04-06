@@ -26,7 +26,7 @@ namespace Operations.DomainService
                 AssetPairId = model.AssetPairId,
                 MessageId = model.MessageId,
                 ReservedLimitVolume = model.ReservedLimitVolume.ToString(CultureInfo.InvariantCulture),
-                Straight = model.Straight,
+                Straight = model.Type != OrderType.Sell,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
             };

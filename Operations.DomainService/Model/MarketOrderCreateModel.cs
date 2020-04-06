@@ -45,13 +45,8 @@ namespace Operations.DomainService.Model
         public IReadOnlyList<Fee> Fees { get; set; }
 
         /// <summary>
-        /// Is straight
+        /// Buy or Sell
         /// </summary>
-        public bool Straight { get; set; }
-
-        /// <summary>
-        /// Timestamp
-        /// </summary>
-        public DateTime Timestamp { get; set; }
+        public OrderType Type { get; set; }
     }
 }
