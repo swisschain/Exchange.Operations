@@ -14,7 +14,9 @@ namespace Operations.DomainService.Model
             Id = response.Id;
             Status = response.Status;
             Reason = response.StatusReason;
-            Price = decimal.Parse(response.Price);
+
+            decimal.TryParse(response.Price, out decimal price);
+            Price = price;
         }
 
         public decimal Price { get; set; }
