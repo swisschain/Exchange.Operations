@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Operations.DomainService;
 using Operations.DomainService.Model;
+using Swisschain.Sdk.Server.Authorization;
 
 namespace Operations.WebApi
 {
@@ -24,14 +25,14 @@ namespace Operations.WebApi
         [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateAsync([FromBody] LimitOrderCreateModel model)
         {
-            var result = await _limitOrderOperations.CreateAsync(model);
+            var result = await _limitOrderOperations.CreateAsync(User.GetTenantId(), model);
             return Ok(result);
         }
 
         [HttpDelete("{limitOrderId}")]
         public async Task<IActionResult> CancelAsync(Guid limitOrderId)
         {
-            await _limitOrderOperations.CancelAsync(limitOrderId);
+            await _limitOrderOperations.CancelAsync(User.GetTenantId(), limitOrderId);
             return NoContent();
         }
     }

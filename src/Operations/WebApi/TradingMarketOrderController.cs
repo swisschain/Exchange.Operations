@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Operations.DomainService;
 using Operations.DomainService.Model;
+using Swisschain.Sdk.Server.Authorization;
 
 namespace Operations.WebApi
 {
@@ -23,7 +24,7 @@ namespace Operations.WebApi
         [ProducesResponseType(typeof(CreateMarketOrderResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> CreateAsync([FromBody] MarketOrderCreateModel model)
         {
-            var result = await _marketOrderOperations.CreateAsync(model);
+            var result = await _marketOrderOperations.CreateAsync(User.GetTenantId(), model);
 
             return Ok(result);
         }
