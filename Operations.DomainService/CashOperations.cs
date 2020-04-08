@@ -15,10 +15,11 @@ namespace Operations.DomainService
             _matchingEngineClient = matchingEngineClient;
         }
 
-        public async Task CashInAsync(CashOperationModel model)
+        public async Task CashInAsync(string brokerId, CashOperationModel model)
         {
             CashInOutOperation request = new CashInOutOperation
             {
+                BrokerId = brokerId,
                 WalletId = model.ClientId,
                 AssetId = model.AssetId,
                 Volume = model.Amount.ToString(CultureInfo.InvariantCulture)
@@ -27,13 +28,16 @@ namespace Operations.DomainService
             await _matchingEngineClient.CashOperations.CashInOutAsync(request);
         }
 
-        public async Task CashOutAsync(CashOperationModel model)
+        public async Task CashOutAsync(string brokerId, CashOperationModel model)
         {
+            var volume = model.Amount >= 0 ? -model.Amount : model.Amount;
+
             CashInOutOperation request = new CashInOutOperation
             {
+                BrokerId = brokerId,
                 WalletId = model.ClientId,
                 AssetId = model.AssetId,
-                Volume = (-model.Amount).ToString(CultureInfo.InvariantCulture)
+                Volume = volume.ToString(CultureInfo.InvariantCulture)
             };
 
             await _matchingEngineClient.CashOperations.CashInOutAsync(request);

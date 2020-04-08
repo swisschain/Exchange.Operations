@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Operations.DomainService;
 using Operations.DomainService.Model;
+using Swisschain.Sdk.Server.Authorization;
 
 namespace Operations.WebApi
 {
@@ -21,7 +22,7 @@ namespace Operations.WebApi
         [HttpPost("cash-in")]
         public async Task<IActionResult> CashInAsync([FromBody] CashOperationModel model)
         {
-            await _cashOperations.CashInAsync(model);
+            await _cashOperations.CashInAsync(User.GetTenantId(), model);
 
             return NoContent();
         }
@@ -29,7 +30,7 @@ namespace Operations.WebApi
         [HttpPost("cash-out")]
         public async Task<IActionResult> CashOutAsync([FromBody] CashOperationModel model)
         {
-            await _cashOperations.CashOutAsync(model);
+            await _cashOperations.CashOutAsync(User.GetTenantId(), model);
 
             return NoContent();
         }

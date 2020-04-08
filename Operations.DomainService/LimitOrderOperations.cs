@@ -17,10 +17,11 @@ namespace Operations.DomainService
             _matchingEngineClient = matchingEngineClient;
         }
 
-        public async Task<OperationResponse> CreateAsync(LimitOrderCreateModel model)
+        public async Task<OperationResponse> CreateAsync(string brokerId, LimitOrderCreateModel model)
         {
             LimitOrder request = new LimitOrder
             {
+                BrokerId = brokerId,
                 WalletId = model.WalletId,
                 AssetPairId = model.AssetPairId,
                 CancelAllPreviousLimitOrders = model.CancelPrevious,
@@ -36,9 +37,13 @@ namespace Operations.DomainService
             return result;
         }
 
-        public async Task<OperationResponse> CancelAsync(Guid limitOrderId)
+        public async Task<OperationResponse> CancelAsync(string brokerId, Guid limitOrderId)
         {
-            LimitOrderCancel request = new LimitOrderCancel { Uid = limitOrderId.ToString() };
+            LimitOrderCancel request = new LimitOrderCancel
+            {
+                BrokerId = brokerId,
+                Uid = limitOrderId.ToString()
+            };
 
             var response = await _matchingEngineClient.Trading.CancelLimitOrderAsync(request);
 

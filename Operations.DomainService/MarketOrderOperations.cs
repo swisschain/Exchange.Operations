@@ -17,11 +17,12 @@ namespace Operations.DomainService
             _matchingEngineClient = matchingEngineClient;
         }
 
-        public async Task<CreateMarketOrderResponse> CreateAsync(MarketOrderCreateModel model)
+        public async Task<CreateMarketOrderResponse> CreateAsync(string brokerId, MarketOrderCreateModel model)
         {
             MarketOrder request = new MarketOrder
             {
                 Uid = model.Id?.ToString(),
+                BrokerId = brokerId,
                 WalletId = model.WalletId,
                 AssetPairId = model.AssetPairId,
                 MessageId = model.MessageId,

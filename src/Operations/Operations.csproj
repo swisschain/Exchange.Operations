@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swisschain.Sdk.Server" Version="4.1.0" />
-    <PackageReference Include="Swisschain.MatchingEngine.Client" Version="1.0.1" />
+    <PackageReference Include="Swisschain.MatchingEngine.Client" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>

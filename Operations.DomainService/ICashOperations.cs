@@ -5,8 +5,8 @@ namespace Operations.DomainService
 {
     public interface ICashOperations
     {
-        Task CashInAsync(CashOperationModel model);
+        Task CashInAsync(string brokerId, CashOperationModel model);
 
-        Task CashOutAsync(CashOperationModel model);
+        Task CashOutAsync(string brokerId, CashOperationModel model);
     }
 }

@@ -5,6 +5,6 @@ namespace Operations.DomainService
 {
     public interface IMarketOrderOperations
     {
-        Task<CreateMarketOrderResponse> CreateAsync(MarketOrderCreateModel model);
+        Task<CreateMarketOrderResponse> CreateAsync(string brokerId, MarketOrderCreateModel model);
     }
 }
