@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Operations.DomainService.Model
 {
@@ -38,11 +37,6 @@ namespace Operations.DomainService.Model
         /// Reserved limit orders
         /// </summary>
         public decimal ReservedLimitVolume { get; set; }
-
-        /// <summary>
-        /// Fees
-        /// </summary>
-        public IReadOnlyList<Fee> Fees { get; set; }
 
         /// <summary>
         /// Buy or Sell
