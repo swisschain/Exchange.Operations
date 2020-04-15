@@ -19,11 +19,6 @@ namespace Operations.DomainService.Model
         public string WalletId { get; set; }
 
         /// <summary>
-        /// Message identifier
-        /// </summary>
-        public string MessageId { get; set; }
-
-        /// <summary>
         /// The asset pair identifier.
         /// </summary>
         public string AssetPairId { get; set; }
@@ -32,15 +27,5 @@ namespace Operations.DomainService.Model
         /// The market order volume.
         /// </summary>
         public decimal Volume { get; set; }
-
-        /// <summary>
-        /// Reserved limit orders
-        /// </summary>
-        public decimal ReservedLimitVolume { get; set; }
-
-        /// <summary>
-        /// Buy or Sell
-        /// </summary>
-        public OrderType Type { get; set; }
     }
 }

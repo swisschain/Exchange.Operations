@@ -21,13 +21,10 @@ namespace Operations.DomainService
         {
             MarketOrder request = new MarketOrder
             {
-                Uid = model.Id?.ToString(),
+                Uid = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
                 WalletId = model.WalletId,
                 AssetPairId = model.AssetPairId,
-                MessageId = model.MessageId,
-                ReservedLimitVolume = model.ReservedLimitVolume.ToString(CultureInfo.InvariantCulture),
-                Straight = model.Type != OrderType.Sell,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
             };
