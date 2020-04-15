@@ -19,9 +19,9 @@ namespace Operations.DomainService.Model
         public string WalletId { get; set; }
 
         /// <summary>
-        /// The asset pair identifier.
+        /// The asset pair symbol.
         /// </summary>
-        public string AssetPairId { get; set; }
+        public string Symbol { get; set; }
 
         /// <summary>
         /// The market order volume.

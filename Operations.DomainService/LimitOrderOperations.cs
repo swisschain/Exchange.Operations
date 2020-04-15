@@ -24,7 +24,7 @@ namespace Operations.DomainService
                 Uid = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
                 WalletId = model.WalletId,
-                AssetPairId = model.AssetPairId,
+                AssetPairId = model.Symbol,
                 CancelAllPreviousLimitOrders = model.CancelPrevious,
                 Price = model.Price.ToString(CultureInfo.InvariantCulture),
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),

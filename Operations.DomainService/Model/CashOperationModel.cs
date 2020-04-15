@@ -7,7 +7,7 @@
     {
         public string ClientId { get; set; }
 
-        public string AssetId { get; set; }
+        public string Symbol { get; set; }
 
         public decimal Amount { get; set; }
     }

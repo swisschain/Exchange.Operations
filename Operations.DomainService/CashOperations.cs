@@ -21,7 +21,7 @@ namespace Operations.DomainService
             {
                 BrokerId = brokerId,
                 WalletId = model.ClientId,
-                AssetId = model.AssetId,
+                AssetId = model.Symbol,
                 Volume = model.Amount.ToString(CultureInfo.InvariantCulture)
             };
 
@@ -36,7 +36,7 @@ namespace Operations.DomainService
             {
                 BrokerId = brokerId,
                 WalletId = model.ClientId,
-                AssetId = model.AssetId,
+                AssetId = model.Symbol,
                 Volume = volume.ToString(CultureInfo.InvariantCulture)
             };
 

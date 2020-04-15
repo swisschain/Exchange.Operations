@@ -16,9 +16,9 @@ namespace Operations.DomainService.Model
         public Guid? Id { get; set; }
 
         /// <summary>
-        /// The asset pair identifier.
+        /// The asset pair symbol.
         /// </summary>
-        public string AssetPairId { get; set; }
+        public string Symbol { get; set; }
 
         /// <summary>
         /// The limit order price.
@@ -39,7 +39,7 @@ namespace Operations.DomainService.Model
         /// The limit order type.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public OrderType Type { get; set; }
+        public LimitOrderType Type { get; set; }
 
         /// <summary>
         /// If <c>true</c> and LimitOrderID is set then previously created limit orders will be closed.
