@@ -29,10 +29,10 @@ namespace Operations.WebApi
             return Ok(result);
         }
 
-        [HttpDelete("{limitOrderId}")]
-        public async Task<IActionResult> CancelAsync(Guid limitOrderId)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> CancelAsync(Guid id)
         {
-            await _limitOrderOperations.CancelAsync(User.GetTenantId(), limitOrderId);
+            await _limitOrderOperations.CancelAsync(User.GetTenantId(), id);
             return NoContent();
         }
     }
