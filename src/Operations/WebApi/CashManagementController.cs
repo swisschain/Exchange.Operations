@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Operations.DomainService;
 using Operations.DomainService.Model;
@@ -20,19 +21,21 @@ namespace Operations.WebApi
         }
 
         [HttpPost("cash-in")]
+        [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> CashInAsync([FromBody] CashOperationModel model)
         {
-            await _cashOperations.CashInAsync(User.GetTenantId(), model);
+            var response = await _cashOperations.CashInAsync(User.GetTenantId(), model);
 
-            return NoContent();
+            return Ok(response);
         }
 
         [HttpPost("cash-out")]
+        [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> CashOutAsync([FromBody] CashOperationModel model)
         {
-            await _cashOperations.CashOutAsync(User.GetTenantId(), model);
+            var response = await _cashOperations.CashOutAsync(User.GetTenantId(), model);
 
-            return NoContent();
+            return Ok(response);
         }
     }
 }
