@@ -44,7 +44,7 @@ namespace Operations.DomainService
             {
                 BrokerId = brokerId,
                 LimitOrderId = { limitOrderId.ToString() },
-                Uid = limitOrderId.ToString()
+                Uid = Guid.NewGuid().ToString()
             };
 
             var response = await _matchingEngineClient.Trading.CancelLimitOrderAsync(request);
