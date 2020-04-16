@@ -21,11 +21,8 @@ namespace Operations
 
             var remoteSettingsConfig = ApplicationEnvironment.Config.Get<RemoteSettingsConfig>();
 
-            using var loggerFactory = LogConfigurator.Configure(
-                "Exchange", 
-                ApplicationEnvironment.Config["SeqUrl"],
-                remoteSettingsConfig.RemoteSettingsUrls);
-            
+            using var loggerFactory = LogConfigurator.Configure("Exchange", remoteSettingsConfig.RemoteSettingsUrls ?? Array.Empty<string>());
+
             var logger = loggerFactory.CreateLogger<Program>();
 
             try
@@ -47,7 +44,7 @@ namespace Operations
                 .SwisschainService<Startup>(options =>
                 {
                     options.UseLoggerFactory(loggerFactory);
-                    options.AddWebJsonConfigurationSources(remoteSettingsConfig.RemoteSettingsUrls);
+                    options.AddWebJsonConfigurationSources(remoteSettingsConfig.RemoteSettingsUrls ?? Array.Empty<string>());
                 });
     }
 }
