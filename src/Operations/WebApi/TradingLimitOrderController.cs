@@ -32,8 +32,9 @@ namespace Operations.WebApi
         [HttpDelete("{id}")]
         public async Task<IActionResult> CancelAsync(Guid id)
         {
-            await _limitOrderOperations.CancelAsync(User.GetTenantId(), id);
-            return NoContent();
+            var result = await _limitOrderOperations.CancelAsync(User.GetTenantId(), id);
+            
+            return Ok(result);
         }
     }
 }
