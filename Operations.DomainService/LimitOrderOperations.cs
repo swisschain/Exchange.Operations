@@ -43,6 +43,7 @@ namespace Operations.DomainService
             LimitOrderCancel request = new LimitOrderCancel
             {
                 BrokerId = brokerId,
+                LimitOrderId = { limitOrderId.ToString() },
                 Uid = limitOrderId.ToString()
             };
 
