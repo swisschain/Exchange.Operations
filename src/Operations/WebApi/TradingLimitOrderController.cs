@@ -30,6 +30,7 @@ namespace Operations.WebApi
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
         public async Task<IActionResult> CancelAsync(Guid id)
         {
             var result = await _limitOrderOperations.CancelAsync(User.GetTenantId(), id);
