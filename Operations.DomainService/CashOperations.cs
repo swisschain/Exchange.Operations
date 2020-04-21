@@ -49,5 +49,22 @@ namespace Operations.DomainService
 
             return new OperationResponse(result);
         }
+
+        public async Task<OperationResponse> CashTransferAsync(string brokerId, CashTransferModel model)
+        {
+            CashTransferOperation request = new CashTransferOperation
+            {
+                Id = Guid.NewGuid().ToString(),
+                BrokerId = brokerId,
+                AssetId = model.Asset,
+                Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
+                FromWalletId = model.FromWallet,
+                ToWalletId = model.ToWallet
+            };
+
+            var result = await _matchingEngineClient.CashOperations.CashTransferAsync(request);
+
+            return new OperationResponse(result);
+        }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Operations.DomainService;
 using Operations.DomainService.Model;
 using Swisschain.Sdk.Server.Authorization;
+using Swisschain.Sdk.Server.WebApi.Common;
 
 namespace Operations.WebApi
 {
@@ -34,6 +35,17 @@ namespace Operations.WebApi
         public async Task<IActionResult> CashOutAsync([FromBody] CashOperationModel model)
         {
             var response = await _cashOperations.CashOutAsync(User.GetTenantId(), model);
+
+            return Ok(response);
+        }
+
+
+        [HttpPost("transfer")]
+        [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ModelStateDictionaryErrorResponse), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CashTransferAsync([FromBody] CashTransferModel model)
+        {
+            var response = await _cashOperations.CashTransferAsync(User.GetTenantId(), model);
 
             return Ok(response);
         }

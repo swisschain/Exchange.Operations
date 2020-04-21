@@ -1,4 +1,7 @@
-﻿using Autofac;
+﻿using System.Reflection;
+using Autofac;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,7 +26,13 @@ namespace Operations
 
         protected override void ConfigureServicesExt(IServiceCollection services)
         {
-
+            services
+                .AddControllersWithViews()
+                .AddFluentValidation(options =>
+            {
+                ValidatorOptions.CascadeMode = CascadeMode.StopOnFirstFailure;
+                options.RegisterValidatorsFromAssembly(Assembly.GetEntryAssembly());
+            });
         }
 
         protected override void ConfigureContainerExt(ContainerBuilder builder)

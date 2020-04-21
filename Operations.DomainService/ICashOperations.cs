@@ -8,5 +8,7 @@ namespace Operations.DomainService
         Task<OperationResponse> CashInAsync(string brokerId, CashOperationModel model);
 
         Task<OperationResponse> CashOutAsync(string brokerId, CashOperationModel model);
+
+        Task<OperationResponse> CashTransferAsync(string brokerId, CashTransferModel model);
     }
 }
