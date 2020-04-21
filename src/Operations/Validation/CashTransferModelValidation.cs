@@ -1,11 +1,13 @@
 ﻿using FluentValidation;
+using JetBrains.Annotations;
 using Operations.DomainService.Model;
 
 namespace Operations.Validation
 {
-    public class CashTransferModelValidation : AbstractValidator<CashTransferModel>
+    [UsedImplicitly]
+    public class CashTransferModelValidator : AbstractValidator<CashTransferModel>
     {
-        public CashTransferModelValidation()
+        public CashTransferModelValidator()
         {
             RuleFor(o => o.Asset)
                 .NotEmpty()
