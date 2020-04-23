@@ -23,7 +23,7 @@ namespace Operations.WebApi
 
         [HttpPost("cash-in")]
         [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CashInAsync([FromBody] CashOperationModel model)
+        public async Task<IActionResult> CashInAsync([FromBody] CashInOutModel model)
         {
             var response = await _cashOperations.CashInAsync(User.GetTenantId(), model);
 
@@ -32,13 +32,12 @@ namespace Operations.WebApi
 
         [HttpPost("cash-out")]
         [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]
-        public async Task<IActionResult> CashOutAsync([FromBody] CashOperationModel model)
+        public async Task<IActionResult> CashOutAsync([FromBody] CashInOutModel model)
         {
             var response = await _cashOperations.CashOutAsync(User.GetTenantId(), model);
 
             return Ok(response);
         }
-
 
         [HttpPost("transfer")]
         [ProducesResponseType(typeof(OperationResponse), StatusCodes.Status200OK)]

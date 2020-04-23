@@ -24,7 +24,7 @@
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
     <PackageReference Include="Swisschain.Sdk.Server" Version="5.0.2" />
-    <PackageReference Include="Swisschain.MatchingEngine.Client" Version="2.0.1" />
+    <PackageReference Include="Swisschain.MatchingEngine.Client" Version="3.0.0-beta.1" />
   </ItemGroup>
 
   <ItemGroup>

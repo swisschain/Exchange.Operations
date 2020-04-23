@@ -16,15 +16,16 @@ namespace Operations.DomainService
             _matchingEngineClient = matchingEngineClient;
         }
 
-        public async Task<OperationResponse> CashInAsync(string brokerId, CashOperationModel model)
+        public async Task<OperationResponse> CashInAsync(string brokerId, CashInOutModel model)
         {
             CashInOutOperation request = new CashInOutOperation
             {
                 Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.ClientId,
-                AssetId = model.Symbol,
-                Volume = model.Amount.ToString(CultureInfo.InvariantCulture)
+                WalletId = model.Wallet,
+                AssetId = model.Asset,
+                Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
+                Description = model.Description
             };
 
             var result = await _matchingEngineClient.CashOperations.CashInOutAsync(request);
@@ -32,17 +33,18 @@ namespace Operations.DomainService
             return new OperationResponse(result);
         }
 
-        public async Task<OperationResponse> CashOutAsync(string brokerId, CashOperationModel model)
+        public async Task<OperationResponse> CashOutAsync(string brokerId, CashInOutModel model)
         {
-            var volume = model.Amount >= 0 ? -model.Amount : model.Amount;
+            var volume = model.Volume >= 0 ? -model.Volume : model.Volume;
 
             CashInOutOperation request = new CashInOutOperation
             {
                 Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.ClientId,
-                AssetId = model.Symbol,
-                Volume = volume.ToString(CultureInfo.InvariantCulture)
+                WalletId = model.Wallet,
+                AssetId = model.Asset,
+                Volume = volume.ToString(CultureInfo.InvariantCulture),
+                Description = model.Description
             };
 
             var result = await _matchingEngineClient.CashOperations.CashInOutAsync(request);
