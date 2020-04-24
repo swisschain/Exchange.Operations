@@ -61,7 +61,8 @@ namespace Operations.DomainService
                 AssetId = model.Asset,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
                 FromWalletId = model.FromWallet,
-                ToWalletId = model.ToWallet
+                ToWalletId = model.ToWallet,
+                Description = model.Description
             };
 
             var result = await _matchingEngineClient.CashOperations.CashTransferAsync(request);
