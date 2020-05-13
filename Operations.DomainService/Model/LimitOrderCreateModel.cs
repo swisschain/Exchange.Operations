@@ -45,5 +45,21 @@ namespace Operations.DomainService.Model
         /// If <c>true</c> and LimitOrderID is set then previously created limit orders will be closed.
         /// </summary>
         public bool CancelPrevious { get; set; }
+
+        public LimitOrderCreateModel()
+        {
+        }
+
+        public LimitOrderCreateModel(Guid? id, string symbol, decimal price, decimal volume,
+            string walletId, LimitOrderType type, bool cancelPrevious)
+        {
+            Id = id;
+            Symbol = symbol;
+            Price = price;
+            Volume = volume;
+            WalletId = walletId;
+            Type = type;
+            CancelPrevious = cancelPrevious;
+        }
     }
 }

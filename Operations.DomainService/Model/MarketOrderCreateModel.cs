@@ -27,5 +27,17 @@ namespace Operations.DomainService.Model
         /// The market order volume.
         /// </summary>
         public decimal Volume { get; set; }
+
+        public MarketOrderCreateModel()
+        {
+        }
+
+        public MarketOrderCreateModel(Guid? id, string symbol, decimal volume, string walletId)
+        {
+            Id = id;
+            Symbol = symbol;
+            Volume = volume;
+            WalletId = walletId;
+        }
     }
 }

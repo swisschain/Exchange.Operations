@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7F3DBAA2-139B-401D-A33F-1409A9BB4DE8}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Operations", "src\Operations\Operations.csproj", "{D9AE04E2-3801-499E-8E95-6F2B2B4BFB41}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OperationsTests", "tests\OperationsTests\OperationsTests.csproj", "{4C51C936-D545-49A9-816A-4F2C357B56DF}"
@@ -38,9 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", 
 		deployment\kubernetes\readme.md = deployment\kubernetes\readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Operations.DomainService", "Operations.DomainService\Operations.DomainService.csproj", "{B028E8DA-1368-4B2F-9D52-5C9F04751C89}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{055063F2-F682-4345-AA90-7242A868A36C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Operations.DomainService", "Operations.DomainService\Operations.DomainService.csproj", "{B028E8DA-1368-4B2F-9D52-5C9F04751C89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,11 +61,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{4C51C936-D545-49A9-816A-4F2C357B56DF} = {7F3DBAA2-139B-401D-A33F-1409A9BB4DE8}
 		{54F26A6C-5B76-40E5-8E9C-2FA0551BC226} = {85EB7950-61F2-4B83-9F3E-F74ECCE0D3C8}
 		{DB08FC9E-A784-4D4D-932C-DA320E3C5091} = {85EB7950-61F2-4B83-9F3E-F74ECCE0D3C8}
 		{AD37D2C5-7CE6-41CD-9515-B65E5A46B96C} = {DB08FC9E-A784-4D4D-932C-DA320E3C5091}
-		{B028E8DA-1368-4B2F-9D52-5C9F04751C89} = {055063F2-F682-4345-AA90-7242A868A36C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {196C39E2-2F2E-46AB-BA2A-0D2E7E171B5A}

@@ -29,5 +29,18 @@
         /// Description
         /// </summary>
         public string Description { get; set; }
+
+        public CashTransferModel()
+        {
+        }
+
+        public CashTransferModel(string asset, decimal volume, string fromWallet, string toWallet, string description)
+        {
+            Asset = asset;
+            Volume = volume;
+            FromWallet = fromWallet;
+            ToWallet = toWallet;
+            Description = description;
+        }
     }
 }

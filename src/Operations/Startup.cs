@@ -2,8 +2,6 @@
 using Autofac;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Operations.Configuration;
@@ -19,11 +17,6 @@ namespace Operations
             AddJwtAuth(Config.Jwt.Secret, "exchange.swisschain.io");
         }
 
-        protected override void ConfigureExt(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            
-        }
-
         protected override void ConfigureServicesExt(IServiceCollection services)
         {
             services
@@ -37,7 +30,7 @@ namespace Operations
 
         protected override void ConfigureContainerExt(ContainerBuilder builder)
         {
-            builder.RegisterModule(new ServiceModule(Config));
+            builder.RegisterModule(new AutofacModule(Config));
         }
     }
 }

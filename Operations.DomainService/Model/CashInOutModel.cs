@@ -24,5 +24,17 @@
         /// Description
         /// </summary>
         public string Description { get; set; }
+
+        public CashInOutModel()
+        {
+        }
+
+        public CashInOutModel(string asset, decimal volume, string wallet, string description)
+        {
+            Asset = asset;
+            Volume = volume;
+            Wallet = wallet;
+            Description = description;
+        }
     }
 }
