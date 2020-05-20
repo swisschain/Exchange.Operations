@@ -19,11 +19,11 @@ namespace Operations.Validation
                 .GreaterThan(0)
                 .WithMessage("Volume must be greater then 0.");
 
-            RuleFor(o => o.FromWallet)
+            RuleFor(o => o.FromWalletId)
                 .NotEmpty()
                 .WithMessage("Source wallet required.");
 
-            RuleFor(o => o.ToWallet)
+            RuleFor(o => o.ToWalletId)
                 .NotEmpty()
                 .WithMessage("Target wallet required.");
         }

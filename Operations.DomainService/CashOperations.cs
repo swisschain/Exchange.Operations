@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using MatchingEngine.Client;
 using MatchingEngine.Client.Contracts.Incoming;
 using Microsoft.Extensions.Logging;
 using Operations.DomainService.Model;
+using Swisschain.Exchange.Accounts.Client;
+using Swisschain.Exchange.Accounts.Client.Models.Wallet;
 using Swisschain.Exchange.Fees.Client;
 using Swisschain.Exchange.Fees.Client.Models.CashOperationsFees;
 using Swisschain.Exchange.Fees.Client.Models.Settings;
@@ -17,22 +20,36 @@ namespace Operations.DomainService
     {
         private readonly IMatchingEngineClient _matchingEngineClient;
         private readonly IFeesClient _feesClient;
+        private readonly IAccountsClient _accountsClient;
         private readonly ILogger<CashOperations> _logger;
 
-        public CashOperations(IMatchingEngineClient matchingEngineClient, IFeesClient feesClient, ILogger<CashOperations> logger)
+        public CashOperations(IMatchingEngineClient matchingEngineClient, 
+            IFeesClient feesClient, IAccountsClient accountsClient, ILogger<CashOperations> logger)
         {
             _matchingEngineClient = matchingEngineClient;
             _feesClient = feesClient;
             _logger = logger;
+            _accountsClient = accountsClient;
         }
 
         public async Task<OperationResponse> CashInAsync(string brokerId, CashInOutModel model)
         {
+            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+
+            if (wallet == null)
+                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+
+            if (!wallet.IsEnabled)
+                throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
+
+            if (wallet.Type != WalletType.Main)
+                throw new ArgumentException($"Wallet type must have type '{WalletType.Main}' for deposit / withdrawal operations.");
+
             var request = new CashInOutOperation
             {
                 Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.Wallet,
+                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
                 AssetId = model.Asset,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
                 Description = model.Description
@@ -49,13 +66,18 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashOutAsync(string brokerId, CashInOutModel model)
         {
+            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+
+            if (wallet == null)
+                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+
             var volume = model.Volume >= 0 ? -model.Volume : model.Volume;
 
             var request = new CashInOutOperation
             {
                 Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.Wallet,
+                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
                 AssetId = model.Asset,
                 Volume = volume.ToString(CultureInfo.InvariantCulture),
                 Description = model.Description
@@ -72,14 +94,32 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashTransferAsync(string brokerId, CashTransferModel model)
         {
+            var wallets = await _accountsClient.Wallet.GetAllAsync(new[] { model.FromWalletId, model.ToWalletId }, brokerId);
+
+            var fromWallet = wallets.SingleOrDefault(x => x.Id == model.FromWalletId);
+
+            var toWallet = wallets.SingleOrDefault(x => x.Id == model.ToWalletId);
+
+            if (fromWallet == null)
+                throw new ArgumentException($"Source wallet '{model.FromWalletId}' doesn't exist.");
+
+            if (toWallet == null)
+                throw new ArgumentException($"Target wallet '{model.ToWalletId}' doesn't exist.");
+
+            if (!toWallet.IsEnabled)
+                throw new ArgumentException($"Target wallet '{model.FromWalletId}' is disabled.");
+
+            if (fromWallet.AccountId != toWallet.AccountId)
+                throw new ArgumentException($"Target and source wallets must have the same account id.");
+
             var request = new CashTransferOperation
             {
                 Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
                 AssetId = model.Asset,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
-                FromWalletId = model.FromWallet,
-                ToWalletId = model.ToWallet,
+                FromWalletId = model.FromWalletId.ToString(CultureInfo.InvariantCulture),
+                ToWalletId = model.ToWalletId.ToString(CultureInfo.InvariantCulture),
                 Description = model.Description
             };
 

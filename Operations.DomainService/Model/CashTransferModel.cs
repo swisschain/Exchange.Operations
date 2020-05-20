@@ -18,12 +18,12 @@
         /// <summary>
         /// Source wallet.
         /// </summary>
-        public string FromWallet { get; set; }
+        public long FromWalletId { get; set; }
 
         /// <summary>
         /// Target wallet.
         /// </summary>
-        public string ToWallet { get; set; }
+        public long ToWalletId { get; set; }
 
         /// <summary>
         /// Description
@@ -34,12 +34,12 @@
         {
         }
 
-        public CashTransferModel(string asset, decimal volume, string fromWallet, string toWallet, string description)
+        public CashTransferModel(string asset, decimal volume, long fromWalletId, long toWalletId, string description)
         {
             Asset = asset;
             Volume = volume;
-            FromWallet = fromWallet;
-            ToWallet = toWallet;
+            FromWalletId = fromWalletId;
+            ToWalletId = toWalletId;
             Description = description;
         }
     }

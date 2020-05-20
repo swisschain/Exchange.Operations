@@ -1,6 +1,6 @@
 ﻿namespace Operations.Configuration
 {
-    public class ExchangeFeesSettings
+    public class AccountsSettings
     {
         public string GrpcUrl { get; set; }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using MatchingEngine.Client.Contracts.Incoming;
+﻿using MatchingEngine.Client.Contracts.Incoming;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

@@ -3,10 +3,12 @@ using MatchingEngine.Client;
 using MatchingEngine.Client.Extensions;
 using Operations.Configuration;
 using Operations.DomainService;
+using Swisschain.Exchange.Accounts.Client;
+using Swisschain.Exchange.Accounts.Client.Extensions;
 using Swisschain.Exchange.Fees.Client;
 using Swisschain.Exchange.Fees.Client.Extensions;
 
-namespace Operations.Modules
+namespace Operations
 {
     public class AutofacModule : Module
     {
@@ -26,7 +28,9 @@ namespace Operations.Modules
                 BalancesServiceAddress = "http://172.16.0.4:4003"
             });
 
-            builder.RegisterFeesClient(new FeesClientSettings{ ServiceAddress = _config.ExchangeFeesService.GrpcUrl });
+            builder.RegisterFeesClient(new FeesClientSettings { ServiceAddress = _config.FeesService.GrpcUrl });
+
+            builder.RegisterAccountsClient(new AccountsClientSettings { ServiceAddress = _config.AccountsService.GrpcUrl });
 
             builder.RegisterType<LimitOrderOperations>()
                 .As<ILimitOrderOperations>()

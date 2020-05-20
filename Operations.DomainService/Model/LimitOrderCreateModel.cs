@@ -18,7 +18,7 @@ namespace Operations.DomainService.Model
         /// <summary>
         /// The asset pair symbol.
         /// </summary>
-        public string Symbol { get; set; }
+        public string AssetPair { get; set; }
 
         /// <summary>
         /// The limit order price.
@@ -33,7 +33,7 @@ namespace Operations.DomainService.Model
         /// <summary>
         /// The wallet identifier.
         /// </summary>
-        public string WalletId { get; set; }
+        public long WalletId { get; set; }
 
         /// <summary>
         /// The limit order type.
@@ -50,11 +50,11 @@ namespace Operations.DomainService.Model
         {
         }
 
-        public LimitOrderCreateModel(Guid? id, string symbol, decimal price, decimal volume,
-            string walletId, LimitOrderType type, bool cancelPrevious)
+        public LimitOrderCreateModel(Guid? id, string assetPair, decimal price, decimal volume,
+            long walletId, LimitOrderType type, bool cancelPrevious)
         {
             Id = id;
-            Symbol = symbol;
+            AssetPair = assetPair;
             Price = price;
             Volume = volume;
             WalletId = walletId;

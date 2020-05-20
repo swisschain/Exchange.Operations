@@ -7,6 +7,7 @@ using MatchingEngine.Client;
 using MatchingEngine.Client.Contracts.Incoming;
 using Microsoft.Extensions.Logging;
 using Operations.DomainService.Model;
+using Swisschain.Exchange.Accounts.Client;
 using Swisschain.Exchange.Fees.Client;
 using Swisschain.Exchange.Fees.Client.Models.Settings;
 using Swisschain.Exchange.Fees.Client.Models.TradingFees;
@@ -18,23 +19,34 @@ namespace Operations.DomainService
     {
         private readonly IMatchingEngineClient _matchingEngineClient;
         private readonly IFeesClient _feesClient;
+        private readonly IAccountsClient _accountsClient;
         private readonly ILogger<LimitOrderOperations> _logger;
 
-        public LimitOrderOperations(IMatchingEngineClient matchingEngineClient, IFeesClient feesClient, ILogger<LimitOrderOperations> logger)
+        public LimitOrderOperations(IMatchingEngineClient matchingEngineClient,
+            IFeesClient feesClient, IAccountsClient accountsClient, ILogger<LimitOrderOperations> logger)
         {
             _matchingEngineClient = matchingEngineClient;
             _feesClient = feesClient;
+            _accountsClient = accountsClient;
             _logger = logger;
         }
 
         public async Task<OperationResponse> CreateAsync(string brokerId, LimitOrderCreateModel model)
         {
+            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+
+            if (wallet == null)
+                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+
+            if (!wallet.IsEnabled)
+                throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
+
             var request = new LimitOrder
             {
                 Uid = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.WalletId,
-                AssetPairId = model.Symbol,
+                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
+                AssetPairId = model.AssetPair,
                 CancelAllPreviousLimitOrders = model.CancelPrevious,
                 Price = model.Price.ToString(CultureInfo.InvariantCulture),
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
@@ -42,7 +54,7 @@ namespace Operations.DomainService
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
             };
 
-            var limitOrderFee = await GetFee(brokerId, model.Symbol);
+            var limitOrderFee = await GetFee(brokerId, model.AssetPair);
 
             request.Fees.Add(limitOrderFee);
 

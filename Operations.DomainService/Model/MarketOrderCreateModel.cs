@@ -16,12 +16,12 @@ namespace Operations.DomainService.Model
         /// <summary>
         /// The wallet identifier.
         /// </summary>
-        public string WalletId { get; set; }
+        public long WalletId { get; set; }
 
         /// <summary>
         /// The asset pair symbol.
         /// </summary>
-        public string Symbol { get; set; }
+        public string AssetPair { get; set; }
 
         /// <summary>
         /// The market order volume.
@@ -32,10 +32,10 @@ namespace Operations.DomainService.Model
         {
         }
 
-        public MarketOrderCreateModel(Guid? id, string symbol, decimal volume, string walletId)
+        public MarketOrderCreateModel(Guid? id, string assetPair, decimal volume, long walletId)
         {
             Id = id;
-            Symbol = symbol;
+            AssetPair = assetPair;
             Volume = volume;
             WalletId = walletId;
         }

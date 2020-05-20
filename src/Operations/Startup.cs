@@ -5,7 +5,6 @@ using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Operations.Configuration;
-using Operations.Modules;
 using Swisschain.Sdk.Server.Common;
 
 namespace Operations

@@ -7,6 +7,7 @@ using MatchingEngine.Client;
 using MatchingEngine.Client.Contracts.Incoming;
 using Microsoft.Extensions.Logging;
 using Operations.DomainService.Model;
+using Swisschain.Exchange.Accounts.Client;
 using Swisschain.Exchange.Fees.Client;
 using Swisschain.Exchange.Fees.Client.Models.Settings;
 using Swisschain.Exchange.Fees.Client.Models.TradingFees;
@@ -19,28 +20,39 @@ namespace Operations.DomainService
     {
         private readonly IMatchingEngineClient _matchingEngineClient;
         private readonly IFeesClient _feesClient;
+        private readonly IAccountsClient _accountsClient;
         private readonly ILogger<MarketOrderOperations> _logger;
 
-        public MarketOrderOperations(IMatchingEngineClient matchingEngineClient, IFeesClient feesClient, ILogger<MarketOrderOperations> logger)
+        public MarketOrderOperations(IMatchingEngineClient matchingEngineClient,
+            IFeesClient feesClient, IAccountsClient accountsClient, ILogger<MarketOrderOperations> logger)
         {
             _matchingEngineClient = matchingEngineClient;
             _feesClient = feesClient;
+            _accountsClient = accountsClient;
             _logger = logger;
         }
 
         public async Task<CreateMarketOrderResponse> CreateAsync(string brokerId, MarketOrderCreateModel model)
         {
+            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+
+            if (wallet == null)
+                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+
+            if (!wallet.IsEnabled)
+                throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
+
             var request = new MarketOrder
             {
                 Uid = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.WalletId,
-                AssetPairId = model.Symbol,
+                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
+                AssetPairId = model.AssetPair,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
             };
 
-            var fee = await GetFee(brokerId, model.Symbol);
+            var fee = await GetFee(brokerId, model.AssetPair);
 
             request.Fees.Add(fee);
 

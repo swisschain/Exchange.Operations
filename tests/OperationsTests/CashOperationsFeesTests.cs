@@ -11,6 +11,9 @@ using Moq;
 using Operations.DomainService;
 using Operations.DomainService.Model;
 using OperationsTests.Utils;
+using Swisschain.Exchange.Accounts.Client;
+using Swisschain.Exchange.Accounts.Client.Api;
+using Swisschain.Exchange.Accounts.Client.Models.Wallet;
 using Swisschain.Exchange.Fees.Client;
 using Swisschain.Exchange.Fees.Client.Api;
 using Swisschain.Exchange.Fees.Client.Models.CashOperationsFees;
@@ -24,9 +27,9 @@ namespace OperationsTests
     public class CashOperationsFeesTests : BaseTests
     {
         private const string BrokerId = "BrokerId";
-        private const string Wallet = "Wallet";
-        private const string FromWallet = "FromWallet";
-        private const string ToWallet = "ToWallet";
+        private const long WalletId = 77;
+        private const long FromWalletId = 11;
+        private const long ToWalletId = 33;
         private const string Btc = "BTC";
         private const decimal CashInVolume = 1;
         private const decimal CashOutNegativeVolume = -1;
@@ -89,6 +92,50 @@ namespace OperationsTests
             return feesClientMock.Object;
         }
 
+        private IAccountsClient InitializeAccountsClient()
+        {
+            var accountsClientMock = new Mock<IAccountsClient>();
+
+            var accountApiMock = new Mock<IAccountApi>();
+            accountsClientMock.SetupGet(x => x.Account).Returns(() => accountApiMock.Object);
+
+            var walletApiMock = new Mock<IWalletApi>();
+            walletApiMock.Setup(x => x.GetAsync(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns((long id, string brokerId) =>
+                {
+                    var wallet = new WalletModel();
+
+                    wallet.Id = id;
+                    wallet.BrokerId = brokerId;
+                    wallet.Type = WalletType.Main;
+                    wallet.IsEnabled = true;
+
+                    return Task.FromResult(wallet);
+                });
+            walletApiMock.Setup(x => x.GetAllAsync(It.IsAny<long[]>(), It.IsAny<string>()))
+                .Returns((IEnumerable<long> ids, string brokerId) =>
+                {
+                    var wallets = new List<WalletModel>();
+
+                    foreach (var id in ids)
+                    {
+                        var wallet = new WalletModel();
+
+                        wallet.Id = id;
+                        wallet.BrokerId = brokerId;
+                        wallet.Type = WalletType.Main;
+                        wallet.IsEnabled = true;
+
+                        wallets.Add(wallet);
+                    }
+
+                    return Task.FromResult((IReadOnlyList<WalletModel>)wallets);
+                });
+            accountsClientMock.SetupGet(x => x.Wallet).Returns(() => walletApiMock.Object);
+
+            return accountsClientMock.Object;
+        }
+
         private CashOperationsFeeModel GetCashOperationsFeeModel(decimal volume, CashType cashType)
         {
             var result = new CashOperationsFeeModel
@@ -121,7 +168,7 @@ namespace OperationsTests
             var result = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet
+                FeeWalletId = WalletId.ToString(CultureInfo.InvariantCulture)
             };
 
             return result;
@@ -132,7 +179,7 @@ namespace OperationsTests
             Assert.NotNull(cashInOutOperation);
             Assert.NotEmpty(cashInOutOperation.Id);
             Assert.Equal(cashInOutOperation.BrokerId, BrokerId);
-            Assert.Equal(cashInOutOperation.WalletId, Wallet);
+            Assert.Equal(cashInOutOperation.WalletId, WalletId.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(cashInOutOperation.AssetId, Btc);
             Assert.Equal(cashInOutOperation.Volume, volume.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(cashInOutOperation.Description, Description);
@@ -143,8 +190,8 @@ namespace OperationsTests
             Assert.NotNull(cashTransferOperation);
             Assert.NotEmpty(cashTransferOperation.Id);
             Assert.Equal(cashTransferOperation.BrokerId, BrokerId);
-            Assert.Equal(cashTransferOperation.FromWalletId, FromWallet);
-            Assert.Equal(cashTransferOperation.ToWalletId, ToWallet);
+            Assert.Equal(cashTransferOperation.FromWalletId, FromWalletId.ToString(CultureInfo.InvariantCulture));
+            Assert.Equal(cashTransferOperation.ToWalletId, ToWalletId.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(cashTransferOperation.AssetId, Btc);
             Assert.Equal(cashTransferOperation.Volume, volume.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(cashTransferOperation.Description, Description);
@@ -185,11 +232,12 @@ namespace OperationsTests
 
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var feesClient = InitializeFeesClient(null, null);
+            var accountsClient = InitializeAccountsClient();
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
 
             // act
 
@@ -216,12 +264,13 @@ namespace OperationsTests
 
             var feeModel = GetCashOperationsFeeModel(CashInVolume, CashType.CashIn);
             var feesClient = InitializeFeesClient(feeModel, null);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
 
             // act
 
@@ -248,12 +297,13 @@ namespace OperationsTests
 
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(null, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
 
             // act
 
@@ -281,12 +331,13 @@ namespace OperationsTests
             var feeModel = GetCashOperationsFeeModel(CashInVolume, CashType.CashIn);
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(feeModel, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
 
             // act
 
@@ -314,11 +365,12 @@ namespace OperationsTests
 
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var feesClient = InitializeFeesClient(null, null);
+            var accountsClient = InitializeAccountsClient();
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
 
             // act
 
@@ -345,12 +397,13 @@ namespace OperationsTests
 
             var feeModel = GetCashOperationsFeeModel(CashOutNegativeVolume, CashType.CashOut);
             var feesClient = InitializeFeesClient(feeModel, null);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
 
             // act
 
@@ -377,12 +430,13 @@ namespace OperationsTests
 
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(null, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
 
             // act
 
@@ -410,12 +464,13 @@ namespace OperationsTests
             var feeModel = GetCashOperationsFeeModel(CashOutNegativeVolume, CashType.CashOut);
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(feeModel, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
 
             // act
 
@@ -443,13 +498,14 @@ namespace OperationsTests
             var feeModel = GetCashOperationsFeeModel(CashOutNegativeVolume, CashType.CashOut);
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(feeModel, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             // Volume is positive here and will 'converted' to negative
-            var model = new CashInOutModel(Btc, CashOutPositiveVolume, Wallet, Description);
+            var model = new CashInOutModel(Btc, CashOutPositiveVolume, WalletId, Description);
 
             // act
 
@@ -477,11 +533,12 @@ namespace OperationsTests
 
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var feesClient = InitializeFeesClient(null, null);
+            var accountsClient = InitializeAccountsClient();
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWallet, ToWallet, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
 
             // act
 
@@ -508,12 +565,13 @@ namespace OperationsTests
 
             var feeModel = GetCashOperationsFeeModel(CashTransferVolume, CashType.Transfer);
             var feesClient = InitializeFeesClient(feeModel, null);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWallet, ToWallet, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
 
             // act
 
@@ -540,12 +598,13 @@ namespace OperationsTests
 
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(null, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWallet, ToWallet, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
 
             // act
 
@@ -574,15 +633,16 @@ namespace OperationsTests
             var settings = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet
+                FeeWalletId = WalletId.ToString(CultureInfo.InvariantCulture)
             };
             var feesClient = InitializeFeesClient(feeModel, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var logger = InitializeLogger<CashOperations>(AssertLoggerWarning, assertCalls);
 
-            var cashOperations = new CashOperations(matchingEngineClient, feesClient, logger);
+            var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWallet, ToWallet, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
 
             // act
 
@@ -599,7 +659,5 @@ namespace OperationsTests
 
             Assert.Equal(1, assertCalls.Count);
         }
-
-        
     }
 }

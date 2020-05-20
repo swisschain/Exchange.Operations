@@ -8,7 +8,7 @@
         /// <summary>
         /// Client's wallet.
         /// </summary>
-        public string Wallet { get; set; }
+        public long WalletId { get; set; }
 
         /// <summary>
         /// Asset that has to be transferred.
@@ -29,11 +29,11 @@
         {
         }
 
-        public CashInOutModel(string asset, decimal volume, string wallet, string description)
+        public CashInOutModel(string asset, decimal volume, long walletId, string description)
         {
             Asset = asset;
             Volume = volume;
-            Wallet = wallet;
+            WalletId = walletId;
             Description = description;
         }
     }

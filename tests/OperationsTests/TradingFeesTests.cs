@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using MatchingEngine.Client;
 using MatchingEngine.Client.Api;
 using MatchingEngine.Client.Contracts.Incoming;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Operations.DomainService;
 using Operations.DomainService.Model;
 using OperationsTests.Utils;
+using Swisschain.Exchange.Accounts.Client;
+using Swisschain.Exchange.Accounts.Client.Api;
+using Swisschain.Exchange.Accounts.Client.Models.Wallet;
 using Swisschain.Exchange.Fees.Client;
 using Swisschain.Exchange.Fees.Client.Api;
 using Swisschain.Exchange.Fees.Client.Models.Settings;
@@ -25,7 +27,7 @@ namespace OperationsTests
     public class TradingFeesTests : BaseTests
     {
         private const string BrokerId = "BrokerId";
-        private const string Wallet = "Wallet";
+        private const long Wallet = 7799;
         private const string Btc = "BTC";
         private const string BtcUsd = "BTCUSD";
         private const decimal MakerFee = 2;
@@ -91,6 +93,50 @@ namespace OperationsTests
             return feesClientMock.Object;
         }
 
+        private IAccountsClient InitializeAccountsClient()
+        {
+            var accountsClientMock = new Mock<IAccountsClient>();
+
+            var accountApiMock = new Mock<IAccountApi>();
+            accountsClientMock.SetupGet(x => x.Account).Returns(() => accountApiMock.Object);
+
+            var walletApiMock = new Mock<IWalletApi>();
+            walletApiMock.Setup(x => x.GetAsync(It.IsAny<long>(), It.IsAny<string>()))
+                .Returns((long id, string brokerId) =>
+                {
+                    var wallet = new WalletModel();
+
+                    wallet.Id = id;
+                    wallet.BrokerId = brokerId;
+                    wallet.Type = WalletType.Main;
+                    wallet.IsEnabled = true;
+
+                    return Task.FromResult(wallet);
+                });
+            walletApiMock.Setup(x => x.GetAllAsync(It.IsAny<long[]>(), It.IsAny<string>()))
+                .Returns((IEnumerable<long> ids, string brokerId) =>
+                {
+                    var wallets = new List<WalletModel>();
+
+                    foreach (var id in ids)
+                    {
+                        var wallet = new WalletModel();
+
+                        wallet.Id = id;
+                        wallet.BrokerId = brokerId;
+                        wallet.Type = WalletType.Main;
+                        wallet.IsEnabled = true;
+
+                        wallets.Add(wallet);
+                    }
+
+                    return Task.FromResult((IReadOnlyList<WalletModel>)wallets);
+                });
+            accountsClientMock.SetupGet(x => x.Wallet).Returns(() => walletApiMock.Object);
+
+            return accountsClientMock.Object;
+        }
+
         private TradingFeeModel GetTradingFeeModel()
         {
             var result = new TradingFeeModel
@@ -113,7 +159,7 @@ namespace OperationsTests
             var result = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet
+                FeeWalletId = Wallet.ToString()
             };
 
             return result;
@@ -125,7 +171,7 @@ namespace OperationsTests
             Assert.NotEmpty(marketOrder.Uid);
             Assert.Equal(marketOrder.Uid, Guid.ToString());
             Assert.Equal(marketOrder.BrokerId, BrokerId);
-            Assert.Equal(marketOrder.WalletId, Wallet);
+            Assert.Equal(marketOrder.WalletId, Wallet.ToString());
             Assert.Equal(marketOrder.AssetPairId, BtcUsd);
             Assert.Equal(marketOrder.Volume, volume.ToString(CultureInfo.InvariantCulture));
             Assert.NotEqual(default, marketOrder.Timestamp);
@@ -140,7 +186,7 @@ namespace OperationsTests
             Assert.Equal(limitOrder.AssetPairId, BtcUsd);
             Assert.Equal(limitOrder.Price, Price.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(limitOrder.Volume, volume.ToString(CultureInfo.InvariantCulture));
-            Assert.Equal(limitOrder.WalletId, Wallet);
+            Assert.Equal(limitOrder.WalletId, Wallet.ToString());
             Assert.Equal(limitOrder.Type, LimitOrderTypeValue);
             Assert.Equal(limitOrder.CancelAllPreviousLimitOrders, CancelPrevious);
             Assert.NotEqual(default, limitOrder.Timestamp);
@@ -196,9 +242,10 @@ namespace OperationsTests
 
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var feesClient = InitializeFeesClient(null, null);
+            var accountsClient = InitializeAccountsClient();
             var logger = InitializeLogger<MarketOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, logger);
+            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
 
@@ -237,10 +284,11 @@ namespace OperationsTests
                 }
             };
             var feesClient = InitializeFeesClient(feeModel, null);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<MarketOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, logger);
+            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
 
@@ -270,13 +318,14 @@ namespace OperationsTests
             var settings = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet
+                FeeWalletId = Wallet.ToString()
             };
             var feesClient = InitializeFeesClient(null, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<MarketOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, logger);
+            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
 
@@ -317,13 +366,14 @@ namespace OperationsTests
             var settings = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet
+                FeeWalletId = Wallet.ToString()
             };
             var feesClient = InitializeFeesClient(feeModel, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(AssertMatchingEngineClientInput, null, assertCalls);
             var logger = InitializeLogger<MarketOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, logger);
+            var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
 
@@ -353,9 +403,10 @@ namespace OperationsTests
 
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var feesClient = InitializeFeesClient(null, null);
+            var accountsClient = InitializeAccountsClient();
             var logger = InitializeLogger<LimitOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var limitOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, logger);
+            var limitOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
             
@@ -384,10 +435,11 @@ namespace OperationsTests
 
             var feeModel = GetTradingFeeModel();
             var feesClient = InitializeFeesClient(feeModel, null);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var logger = InitializeLogger<LimitOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, logger);
+            var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
 
@@ -416,10 +468,11 @@ namespace OperationsTests
 
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(null, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var logger = InitializeLogger<LimitOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, logger);
+            var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
 
@@ -449,10 +502,11 @@ namespace OperationsTests
             var feeModel = GetTradingFeeModel();
             var settings = GetSettingsModel();
             var feesClient = InitializeFeesClient(feeModel, settings);
+            var accountsClient = InitializeAccountsClient();
             var matchingEngineClient = InitializeMatchingEngineClient(null, AssertMatchingEngineClientInput, assertCalls);
             var logger = InitializeLogger<LimitOrderOperations>(AssertLoggerWarning, assertCalls);
 
-            var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, logger);
+            var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
 
