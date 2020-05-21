@@ -34,7 +34,7 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashInAsync(string brokerId, CashInOutModel model)
         {
-            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
             if (wallet == null)
                 throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
@@ -49,7 +49,8 @@ namespace Operations.DomainService
             {
                 Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
+                AccountId = model.AccountId,
+                WalletId = model.WalletId,
                 AssetId = model.Asset,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
                 Description = model.Description
@@ -66,7 +67,7 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashOutAsync(string brokerId, CashInOutModel model)
         {
-            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
             if (wallet == null)
                 throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
@@ -77,7 +78,8 @@ namespace Operations.DomainService
             {
                 Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
+                AccountId = model.AccountId,
+                WalletId = model.WalletId,
                 AssetId = model.Asset,
                 Volume = volume.ToString(CultureInfo.InvariantCulture),
                 Description = model.Description
@@ -94,11 +96,11 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashTransferAsync(string brokerId, CashTransferModel model)
         {
-            var wallets = await _accountsClient.Wallet.GetAllAsync(new[] { model.FromWalletId, model.ToWalletId }, brokerId);
+            var wallets = await _accountsClient.Wallet.GetAllAsync(new [] { (long)model.FromWalletId, (long)model.ToWalletId }, brokerId);
 
-            var fromWallet = wallets.SingleOrDefault(x => x.Id == model.FromWalletId);
+            var fromWallet = wallets.SingleOrDefault(x => x.Id == (long)model.FromWalletId);
 
-            var toWallet = wallets.SingleOrDefault(x => x.Id == model.ToWalletId);
+            var toWallet = wallets.SingleOrDefault(x => x.Id == (long)model.ToWalletId);
 
             if (fromWallet == null)
                 throw new ArgumentException($"Source wallet '{model.FromWalletId}' doesn't exist.");
@@ -118,8 +120,9 @@ namespace Operations.DomainService
                 BrokerId = brokerId,
                 AssetId = model.Asset,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
-                FromWalletId = model.FromWalletId.ToString(CultureInfo.InvariantCulture),
-                ToWalletId = model.ToWalletId.ToString(CultureInfo.InvariantCulture),
+                AccountId = model.AccountId,
+                FromWalletId = model.FromWalletId,
+                ToWalletId = model.ToWalletId,
                 Description = model.Description
             };
 
@@ -153,9 +156,9 @@ namespace Operations.DomainService
                 return NoFee();
             }
 
-            if (string.IsNullOrWhiteSpace(settings.FeeWalletId))
+            if (settings.FeeWalletId == 0)
             {
-                _logger.LogWarning("FeeWalletId is empty. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
+                _logger.LogWarning("FeeWalletId is 0. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
 
                 return NoFee();
             }
@@ -183,7 +186,7 @@ namespace Operations.DomainService
             {
                 Size = Map(value, feeType).ToString(CultureInfo.InvariantCulture),
                 SizeType = (int)Map(feeType),
-                TargetWalletId = settings.FeeWalletId,
+                TargetWalletId = (ulong?)settings.FeeWalletId,
                 Type = (int)Map(value)
             };
 

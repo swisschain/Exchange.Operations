@@ -14,9 +14,14 @@ namespace Operations.DomainService.Model
         public Guid? Id { get; set; }
 
         /// <summary>
+        /// Client's account.
+        /// </summary>
+        public ulong AccountId { get; set; }
+
+        /// <summary>
         /// The wallet identifier.
         /// </summary>
-        public long WalletId { get; set; }
+        public ulong WalletId { get; set; }
 
         /// <summary>
         /// The asset pair symbol.
@@ -32,11 +37,12 @@ namespace Operations.DomainService.Model
         {
         }
 
-        public MarketOrderCreateModel(Guid? id, string assetPair, decimal volume, long walletId)
+        public MarketOrderCreateModel(Guid? id, string assetPair, decimal volume, ulong accountId, ulong walletId)
         {
             Id = id;
             AssetPair = assetPair;
             Volume = volume;
+            AccountId = accountId;
             WalletId = walletId;
         }
     }

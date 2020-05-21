@@ -34,7 +34,7 @@ namespace Operations.DomainService
 
         public async Task<CreateMarketOrderResponse> CreateAsync(string brokerId, MarketOrderCreateModel model)
         {
-            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
             if (wallet == null)
                 throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
@@ -44,9 +44,10 @@ namespace Operations.DomainService
 
             var request = new MarketOrder
             {
-                Uid = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
+                Id = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
+                AccountId = model.AccountId,
+                WalletId = model.WalletId,
                 AssetPairId = model.AssetPair,
                 Volume = model.Volume.ToString(CultureInfo.InvariantCulture),
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
@@ -85,9 +86,9 @@ namespace Operations.DomainService
                 return NoFee();
             }
 
-            if (string.IsNullOrWhiteSpace(settings.FeeWalletId))
+            if (settings.FeeWalletId == 0)
             {
-                _logger.LogWarning("FeeWalletId is empty. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
+                _logger.LogWarning("FeeWalletId is 0. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
 
                 return NoFee();
             }
@@ -113,7 +114,7 @@ namespace Operations.DomainService
             {
                 Size = size.ToString(CultureInfo.InvariantCulture),
                 SizeType = (int)FeeSizeType.Percentage,
-                TargetWalletId = feeWallet,
+                TargetWalletId = (ulong?)feeWallet,
                 Type = feeType
             };
 

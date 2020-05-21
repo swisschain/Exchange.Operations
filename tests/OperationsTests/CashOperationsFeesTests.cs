@@ -21,15 +21,17 @@ using Swisschain.Exchange.Fees.Client.Models.Settings;
 using Xunit;
 using Fee = MatchingEngine.Client.Contracts.Incoming.Fee;
 using FeeType = MatchingEngine.Client.Contracts.Incoming.FeeType;
+using WalletType = Swisschain.Exchange.Accounts.Client.Models.Wallet.WalletType;
 
 namespace OperationsTests
 {
     public class CashOperationsFeesTests : BaseTests
     {
         private const string BrokerId = "BrokerId";
-        private const long WalletId = 77;
-        private const long FromWalletId = 11;
-        private const long ToWalletId = 33;
+        private const ulong WalletId = 77;
+        private const ulong AccountId = 99;
+        private const ulong FromWalletId = 11;
+        private const ulong ToWalletId = 33;
         private const string Btc = "BTC";
         private const decimal CashInVolume = 1;
         private const decimal CashOutNegativeVolume = -1;
@@ -168,7 +170,7 @@ namespace OperationsTests
             var result = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = WalletId.ToString(CultureInfo.InvariantCulture)
+                FeeWalletId = (long)WalletId
             };
 
             return result;
@@ -179,7 +181,8 @@ namespace OperationsTests
             Assert.NotNull(cashInOutOperation);
             Assert.NotEmpty(cashInOutOperation.Id);
             Assert.Equal(cashInOutOperation.BrokerId, BrokerId);
-            Assert.Equal(cashInOutOperation.WalletId, WalletId.ToString(CultureInfo.InvariantCulture));
+            Assert.Equal(cashInOutOperation.AccountId, AccountId);
+            Assert.Equal(cashInOutOperation.WalletId, WalletId);
             Assert.Equal(cashInOutOperation.AssetId, Btc);
             Assert.Equal(cashInOutOperation.Volume, volume.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(cashInOutOperation.Description, Description);
@@ -190,8 +193,9 @@ namespace OperationsTests
             Assert.NotNull(cashTransferOperation);
             Assert.NotEmpty(cashTransferOperation.Id);
             Assert.Equal(cashTransferOperation.BrokerId, BrokerId);
-            Assert.Equal(cashTransferOperation.FromWalletId, FromWalletId.ToString(CultureInfo.InvariantCulture));
-            Assert.Equal(cashTransferOperation.ToWalletId, ToWalletId.ToString(CultureInfo.InvariantCulture));
+            Assert.Equal(cashTransferOperation.AccountId, AccountId);
+            Assert.Equal(cashTransferOperation.FromWalletId, FromWalletId);
+            Assert.Equal(cashTransferOperation.ToWalletId, ToWalletId);
             Assert.Equal(cashTransferOperation.AssetId, Btc);
             Assert.Equal(cashTransferOperation.Volume, volume.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(cashTransferOperation.Description, Description);
@@ -237,7 +241,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -270,7 +274,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -303,7 +307,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -337,7 +341,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashInVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashInVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -370,7 +374,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -403,7 +407,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -436,7 +440,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -470,7 +474,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashInOutModel(Btc, CashOutNegativeVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashOutNegativeVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -505,7 +509,7 @@ namespace OperationsTests
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
             // Volume is positive here and will 'converted' to negative
-            var model = new CashInOutModel(Btc, CashOutPositiveVolume, WalletId, Description);
+            var model = new CashInOutModel(Btc, CashOutPositiveVolume, AccountId, WalletId, Description);
 
             // act
 
@@ -538,7 +542,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, AccountId, FromWalletId, ToWalletId, Description);
 
             // act
 
@@ -571,7 +575,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, AccountId, FromWalletId, ToWalletId, Description);
 
             // act
 
@@ -604,7 +608,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, AccountId, FromWalletId, ToWalletId, Description);
 
             // act
 
@@ -633,7 +637,7 @@ namespace OperationsTests
             var settings = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = WalletId.ToString(CultureInfo.InvariantCulture)
+                FeeWalletId = (long)WalletId
             };
             var feesClient = InitializeFeesClient(feeModel, settings);
             var accountsClient = InitializeAccountsClient();
@@ -642,7 +646,7 @@ namespace OperationsTests
 
             var cashOperations = new CashOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new CashTransferModel(Btc, CashTransferVolume, FromWalletId, ToWalletId, Description);
+            var model = new CashTransferModel(Btc, CashTransferVolume, AccountId, FromWalletId, ToWalletId, Description);
 
             // act
 

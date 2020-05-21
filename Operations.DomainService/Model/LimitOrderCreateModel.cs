@@ -31,9 +31,14 @@ namespace Operations.DomainService.Model
         public decimal Volume { get; set; }
 
         /// <summary>
+        /// Client's account.
+        /// </summary>
+        public ulong AccountId { get; set; }
+
+        /// <summary>
         /// The wallet identifier.
         /// </summary>
-        public long WalletId { get; set; }
+        public ulong WalletId { get; set; }
 
         /// <summary>
         /// The limit order type.
@@ -51,12 +56,13 @@ namespace Operations.DomainService.Model
         }
 
         public LimitOrderCreateModel(Guid? id, string assetPair, decimal price, decimal volume,
-            long walletId, LimitOrderType type, bool cancelPrevious)
+            ulong accountId, ulong walletId, LimitOrderType type, bool cancelPrevious)
         {
             Id = id;
             AssetPair = assetPair;
             Price = price;
             Volume = volume;
+            AccountId = accountId;
             WalletId = walletId;
             Type = type;
             CancelPrevious = cancelPrevious;

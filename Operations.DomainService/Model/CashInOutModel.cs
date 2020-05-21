@@ -6,9 +6,14 @@
     public class CashInOutModel
     {
         /// <summary>
+        /// Client's account.
+        /// </summary>
+        public ulong AccountId { get; set; }
+
+        /// <summary>
         /// Client's wallet.
         /// </summary>
-        public long WalletId { get; set; }
+        public ulong WalletId { get; set; }
 
         /// <summary>
         /// Asset that has to be transferred.
@@ -29,10 +34,11 @@
         {
         }
 
-        public CashInOutModel(string asset, decimal volume, long walletId, string description)
+        public CashInOutModel(string asset, decimal volume, ulong accountId, ulong walletId, string description)
         {
             Asset = asset;
             Volume = volume;
+            AccountId = accountId;
             WalletId = walletId;
             Description = description;
         }

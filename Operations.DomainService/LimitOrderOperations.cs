@@ -33,7 +33,7 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CreateAsync(string brokerId, LimitOrderCreateModel model)
         {
-            var wallet = await _accountsClient.Wallet.GetAsync(model.WalletId, brokerId);
+            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
             if (wallet == null)
                 throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
@@ -43,9 +43,10 @@ namespace Operations.DomainService
 
             var request = new LimitOrder
             {
-                Uid = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
+                Id = model.Id.HasValue ? model.Id.Value.ToString() : Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
-                WalletId = model.WalletId.ToString(CultureInfo.InvariantCulture),
+                AccountId = model.AccountId,
+                WalletId = model.WalletId,
                 AssetPairId = model.AssetPair,
                 CancelAllPreviousLimitOrders = model.CancelPrevious,
                 Price = model.Price.ToString(CultureInfo.InvariantCulture),
@@ -69,7 +70,7 @@ namespace Operations.DomainService
         {
             LimitOrderCancel request = new LimitOrderCancel
             {
-                Uid = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid().ToString(),
                 BrokerId = brokerId,
                 LimitOrderId = { limitOrderId.ToString() }
             };
@@ -103,9 +104,9 @@ namespace Operations.DomainService
                 return NoFee();
             }
 
-            if (string.IsNullOrWhiteSpace(settings.FeeWalletId))
+            if (settings.FeeWalletId == 0)
             {
-                _logger.LogWarning("FeeWalletId is empty. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
+                _logger.LogWarning("FeeWalletId is 0. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
 
                 return NoFee();
             }
@@ -134,7 +135,7 @@ namespace Operations.DomainService
                 MakerSizeType = (int)FeeSizeType.Percentage,
                 TakerSize = takerSize.ToString(CultureInfo.InvariantCulture),
                 TakerSizeType = (int)FeeSizeType.Percentage,
-                TargetWalletId = feeWallet,
+                TargetWalletId = (ulong)feeWallet,
                 Type = feeType
             };
 

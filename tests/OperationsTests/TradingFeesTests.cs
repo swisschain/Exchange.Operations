@@ -27,7 +27,8 @@ namespace OperationsTests
     public class TradingFeesTests : BaseTests
     {
         private const string BrokerId = "BrokerId";
-        private const long Wallet = 7799;
+        private const ulong WalletId = 7799;
+        private const ulong AccountId = 99;
         private const string Btc = "BTC";
         private const string BtcUsd = "BTCUSD";
         private const decimal MakerFee = 2;
@@ -146,8 +147,8 @@ namespace OperationsTests
                 AssetPair = BtcUsd,
                 Levels = new List<TradingFeeLevelModel>
                 {
-                    new TradingFeeLevelModel { Id = Guid.NewGuid(), MakerFee = MakerFee*2, TakerFee = TakerFee*2, Volume = 1 },
-                    new TradingFeeLevelModel { Id = Guid.NewGuid(), MakerFee = MakerFee, TakerFee = TakerFee, Volume = 0.5m }
+                    new TradingFeeLevelModel { Id = 1, MakerFee = MakerFee*2, TakerFee = TakerFee*2, Volume = 1 },
+                    new TradingFeeLevelModel { Id = 2, MakerFee = MakerFee, TakerFee = TakerFee, Volume = 0.5m }
                 }
             };
 
@@ -159,7 +160,7 @@ namespace OperationsTests
             var result = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet.ToString()
+                FeeWalletId = (long)WalletId
             };
 
             return result;
@@ -168,10 +169,11 @@ namespace OperationsTests
         private void AssertMarketOrder(MarketOrder marketOrder, decimal volume)
         {
             Assert.NotNull(marketOrder);
-            Assert.NotEmpty(marketOrder.Uid);
-            Assert.Equal(marketOrder.Uid, Guid.ToString());
+            Assert.NotEmpty(marketOrder.Id);
+            Assert.Equal(marketOrder.Id, Guid.ToString());
             Assert.Equal(marketOrder.BrokerId, BrokerId);
-            Assert.Equal(marketOrder.WalletId, Wallet.ToString());
+            Assert.Equal(marketOrder.AccountId, AccountId);
+            Assert.Equal(marketOrder.WalletId, WalletId);
             Assert.Equal(marketOrder.AssetPairId, BtcUsd);
             Assert.Equal(marketOrder.Volume, volume.ToString(CultureInfo.InvariantCulture));
             Assert.NotEqual(default, marketOrder.Timestamp);
@@ -180,13 +182,14 @@ namespace OperationsTests
         private void AssertLimitOrder(LimitOrder limitOrder, decimal volume)
         {
             Assert.NotNull(limitOrder);
-            Assert.NotEmpty(limitOrder.Uid);
-            Assert.Equal(limitOrder.Uid, Guid.ToString());
+            Assert.NotEmpty(limitOrder.Id);
+            Assert.Equal(limitOrder.Id, Guid.ToString());
             Assert.Equal(limitOrder.BrokerId, BrokerId);
+            Assert.Equal(limitOrder.AccountId, AccountId);
             Assert.Equal(limitOrder.AssetPairId, BtcUsd);
             Assert.Equal(limitOrder.Price, Price.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(limitOrder.Volume, volume.ToString(CultureInfo.InvariantCulture));
-            Assert.Equal(limitOrder.WalletId, Wallet.ToString());
+            Assert.Equal(limitOrder.WalletId, WalletId);
             Assert.Equal(limitOrder.Type, LimitOrderTypeValue);
             Assert.Equal(limitOrder.CancelAllPreviousLimitOrders, CancelPrevious);
             Assert.NotEqual(default, limitOrder.Timestamp);
@@ -247,7 +250,7 @@ namespace OperationsTests
 
             var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
+            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, AccountId, WalletId);
 
             // act
 
@@ -279,8 +282,8 @@ namespace OperationsTests
                 AssetPair = BtcUsd,
                 Levels = new List<TradingFeeLevelModel>
                 {
-                    new TradingFeeLevelModel { Id = Guid.NewGuid(), MakerFee = MakerFee*2, TakerFee = TakerFee*2, Volume = 1 },
-                    new TradingFeeLevelModel { Id = Guid.NewGuid(), MakerFee = MakerFee, TakerFee = TakerFee, Volume = 0.5m }
+                    new TradingFeeLevelModel { Id = 1, MakerFee = MakerFee*2, TakerFee = TakerFee*2, Volume = 1 },
+                    new TradingFeeLevelModel { Id = 2, MakerFee = MakerFee, TakerFee = TakerFee, Volume = 0.5m }
                 }
             };
             var feesClient = InitializeFeesClient(feeModel, null);
@@ -290,7 +293,7 @@ namespace OperationsTests
 
             var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
+            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, AccountId, WalletId);
 
             // act
 
@@ -318,7 +321,7 @@ namespace OperationsTests
             var settings = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet.ToString()
+                FeeWalletId = (long)WalletId
             };
             var feesClient = InitializeFeesClient(null, settings);
             var accountsClient = InitializeAccountsClient();
@@ -327,7 +330,7 @@ namespace OperationsTests
 
             var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
+            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, AccountId, WalletId);
 
             // act
 
@@ -359,14 +362,14 @@ namespace OperationsTests
                 AssetPair = BtcUsd,
                 Levels = new List<TradingFeeLevelModel>
                 {
-                    new TradingFeeLevelModel { Id = Guid.NewGuid(), MakerFee = MakerFee*2, TakerFee = TakerFee*2, Volume = 1 },
-                    new TradingFeeLevelModel { Id = Guid.NewGuid(), MakerFee = MakerFee, TakerFee = TakerFee, Volume = 0.5m }
+                    new TradingFeeLevelModel { Id = 1, MakerFee = MakerFee*2, TakerFee = TakerFee*2, Volume = 1 },
+                    new TradingFeeLevelModel { Id = 2, MakerFee = MakerFee, TakerFee = TakerFee, Volume = 0.5m }
                 }
             };
             var settings = new SettingsModel
             {
                 BrokerId = BrokerId,
-                FeeWalletId = Wallet.ToString()
+                FeeWalletId = (long)WalletId
             };
             var feesClient = InitializeFeesClient(feeModel, settings);
             var accountsClient = InitializeAccountsClient();
@@ -375,7 +378,7 @@ namespace OperationsTests
 
             var marketOrderOperations = new MarketOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, Wallet);
+            var model = new MarketOrderCreateModel(Guid, BtcUsd, Volume, AccountId, WalletId);
 
             // act
 
@@ -408,7 +411,7 @@ namespace OperationsTests
 
             var limitOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
+            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, AccountId, WalletId, LimitOrderTypeModel, CancelPrevious);
             
             // act
 
@@ -441,7 +444,7 @@ namespace OperationsTests
 
             var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
+            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, AccountId, WalletId, LimitOrderTypeModel, CancelPrevious);
 
             // act
 
@@ -474,7 +477,7 @@ namespace OperationsTests
 
             var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
+            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, AccountId, WalletId, LimitOrderTypeModel, CancelPrevious);
 
             // act
 
@@ -508,7 +511,7 @@ namespace OperationsTests
 
             var marketOrderOperations = new LimitOrderOperations(matchingEngineClient, feesClient, accountsClient, logger);
 
-            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, Wallet, LimitOrderTypeModel, CancelPrevious);
+            var model = new LimitOrderCreateModel(Guid, BtcUsd, Price, Volume, AccountId, WalletId, LimitOrderTypeModel, CancelPrevious);
 
             // act
 
