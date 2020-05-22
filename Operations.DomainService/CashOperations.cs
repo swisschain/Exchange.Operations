@@ -34,16 +34,16 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashInAsync(string brokerId, CashInOutModel model)
         {
-            //var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
+            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
-            //if (wallet == null)
-            //    throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+            if (wallet == null)
+                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
 
-            //if (!wallet.IsEnabled)
-            //    throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
+            if (!wallet.IsEnabled)
+                throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
 
-            //if (wallet.Type != WalletType.Main)
-            //    throw new ArgumentException($"Wallet type must have type '{WalletType.Main}' for deposit / withdrawal operations.");
+            if (wallet.Type != WalletType.Main)
+                throw new ArgumentException($"Wallet type must have type '{WalletType.Main}' for deposit / withdrawal operations.");
 
             var request = new CashInOutOperation
             {
@@ -56,9 +56,9 @@ namespace Operations.DomainService
                 Description = model.Description
             };
 
-            //var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashIn);
+            var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashIn);
 
-            //request.Fees.Add(fee);
+            request.Fees.Add(fee);
 
             var result = await _matchingEngineClient.CashOperations.CashInOutAsync(request);
 
@@ -67,10 +67,10 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashOutAsync(string brokerId, CashInOutModel model)
         {
-            //var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
+            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
-            //if (wallet == null)
-            //    throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+            if (wallet == null)
+                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
 
             var volume = model.Volume >= 0 ? -model.Volume : model.Volume;
 
@@ -85,9 +85,9 @@ namespace Operations.DomainService
                 Description = model.Description
             };
 
-            //var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashOut);
+            var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashOut);
 
-            //request.Fees.Add(fee);
+            request.Fees.Add(fee);
 
             var result = await _matchingEngineClient.CashOperations.CashInOutAsync(request);
 
@@ -96,23 +96,23 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashTransferAsync(string brokerId, CashTransferModel model)
         {
-            //var wallets = await _accountsClient.Wallet.GetAllAsync(new [] { (long)model.FromWalletId, (long)model.ToWalletId }, brokerId);
+            var wallets = await _accountsClient.Wallet.GetAllAsync(new[] { (long)model.FromWalletId, (long)model.ToWalletId }, brokerId);
 
-            //var fromWallet = wallets.SingleOrDefault(x => x.Id == (long)model.FromWalletId);
+            var fromWallet = wallets.SingleOrDefault(x => x.Id == (long)model.FromWalletId);
 
-            //var toWallet = wallets.SingleOrDefault(x => x.Id == (long)model.ToWalletId);
+            var toWallet = wallets.SingleOrDefault(x => x.Id == (long)model.ToWalletId);
 
-            //if (fromWallet == null)
-            //    throw new ArgumentException($"Source wallet '{model.FromWalletId}' doesn't exist.");
+            if (fromWallet == null)
+                throw new ArgumentException($"Source wallet '{model.FromWalletId}' doesn't exist.");
 
-            //if (toWallet == null)
-            //    throw new ArgumentException($"Target wallet '{model.ToWalletId}' doesn't exist.");
+            if (toWallet == null)
+                throw new ArgumentException($"Target wallet '{model.ToWalletId}' doesn't exist.");
 
-            //if (!toWallet.IsEnabled)
-            //    throw new ArgumentException($"Target wallet '{model.FromWalletId}' is disabled.");
+            if (!toWallet.IsEnabled)
+                throw new ArgumentException($"Target wallet '{model.FromWalletId}' is disabled.");
 
-            //if (fromWallet.AccountId != toWallet.AccountId)
-            //    throw new ArgumentException($"Target and source wallets must have the same account id.");
+            if (fromWallet.AccountId != toWallet.AccountId)
+                throw new ArgumentException($"Target and source wallets must have the same account id.");
 
             var request = new CashTransferOperation
             {
@@ -126,9 +126,9 @@ namespace Operations.DomainService
                 Description = model.Description
             };
 
-            //var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.Transfer);
+            var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.Transfer);
 
-            //request.Fees.Add(fee);
+            request.Fees.Add(fee);
 
             var result = await _matchingEngineClient.CashOperations.CashTransferAsync(request);
 
@@ -143,7 +143,7 @@ namespace Operations.DomainService
             if (cashOperationsFee == null)
             {
                 _logger.LogWarning("CashOperationsFee from Exchange.Fees is null. The fee is set to 0. " +
-                    "BrokerId={$BrokerId}; Asset={$Asset}", brokerId, asset);
+                    "BrokerId={@BrokerId}; Asset={@Asset}", brokerId, asset);
 
                 return NoFee();
             }
@@ -151,14 +151,14 @@ namespace Operations.DomainService
             if (settings == null)
             {
                 _logger.LogWarning("Settings is null. The fee is set to 0." +
-                    "BrokerId={$BrokerId}", brokerId);
+                    "BrokerId={@BrokerId}", brokerId);
 
                 return NoFee();
             }
 
             if (settings.FeeWalletId == 0)
             {
-                _logger.LogWarning("FeeWalletId is 0. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
+                _logger.LogWarning("FeeWalletId is 0. The fee is set to 0. BrokerId={@BrokerId}", brokerId);
 
                 return NoFee();
             }
@@ -186,7 +186,8 @@ namespace Operations.DomainService
             {
                 Size = Map(value, feeType).ToString(CultureInfo.InvariantCulture),
                 SizeType = (int)Map(feeType),
-                TargetWalletId = (ulong?)settings.FeeWalletId,
+                TargetAccountId = (ulong)settings.FeeAccountId,
+                TargetWalletId = (ulong)settings.FeeWalletId,
                 Type = (int)Map(value)
             };
 
@@ -204,7 +205,7 @@ namespace Operations.DomainService
             catch (Exception e)
             {
                 _logger.LogWarning(e, "Something went wrong while requesting CashOperationsFee. The fee is set to 0. " +
-                                      "BrokerId={$BrokerId}; Asset={$Asset}", brokerId, asset);
+                                      "BrokerId={@BrokerId}; Asset={@Asset}", brokerId, asset);
 
                 return null;
             }
@@ -221,7 +222,7 @@ namespace Operations.DomainService
             catch (Exception e)
             {
                 _logger.LogWarning(e, "Something went wrong while requesting broker FeesSettings. The fee is set to 0. " +
-                                      "BrokerId={$BrokerId}", brokerId);
+                                      "BrokerId={@BrokerId}", brokerId);
 
                 return null;
             }

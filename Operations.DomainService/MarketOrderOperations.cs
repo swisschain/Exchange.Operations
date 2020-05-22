@@ -34,13 +34,13 @@ namespace Operations.DomainService
 
         public async Task<CreateMarketOrderResponse> CreateAsync(string brokerId, MarketOrderCreateModel model)
         {
-            //var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
+            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
-            //if (wallet == null)
-            //    throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+            if (wallet == null)
+                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
 
-            //if (!wallet.IsEnabled)
-            //    throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
+            if (!wallet.IsEnabled)
+                throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
 
             var request = new MarketOrder
             {
@@ -53,9 +53,9 @@ namespace Operations.DomainService
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
             };
 
-            //var fee = await GetFee(brokerId, model.AssetPair);
+            var fee = await GetFee(brokerId, model.AssetPair);
 
-            //request.Fees.Add(fee);
+            request.Fees.Add(fee);
 
             var response = await _matchingEngineClient.Trading.CreateMarketOrderAsync(request);
 
@@ -73,7 +73,7 @@ namespace Operations.DomainService
             if (tradingFee == null)
             {
                 _logger.LogWarning("TradingFee from Exchange.Fees is null. The fee is set to 0. " +
-                                   "BrokerId={$BrokerId}; AssetPair={$AssetPair}", brokerId, assetPair);
+                                   "BrokerId={@BrokerId}; AssetPair={@AssetPair}", brokerId, assetPair);
 
                 return NoFee();
             }
@@ -81,14 +81,14 @@ namespace Operations.DomainService
             if (settings == null)
             {
                 _logger.LogWarning("Settings is null. The fee is set to 0." +
-                                   "BrokerId={$BrokerId}", brokerId);
+                                   "BrokerId={@BrokerId}", brokerId);
 
                 return NoFee();
             }
 
             if (settings.FeeWalletId == 0)
             {
-                _logger.LogWarning("FeeWalletId is 0. The fee is set to 0. BrokerId={$BrokerId}", brokerId);
+                _logger.LogWarning("FeeWalletId is 0. The fee is set to 0. BrokerId={@BrokerId}", brokerId);
 
                 return NoFee();
             }
@@ -96,12 +96,13 @@ namespace Operations.DomainService
             if (tradingFee.Levels == null || tradingFee.Levels.Count == 0)
             {
                 _logger.LogWarning("TradingFee from Exchange.Fees has no levels. The fee is set to 0. " +
-                                   "BrokerId={$BrokerId}; AssetPair={$AssetPair}", brokerId, assetPair);
+                                   "BrokerId={@BrokerId}; AssetPair={@AssetPair}", brokerId, assetPair);
 
                 return NoFee();
             }
 
-            var feeWallet = settings.FeeWalletId;
+            var feeAccountId = settings.FeeAccountId;
+            var feeWalletId = settings.FeeWalletId;
 
             // TODO: take first level as we don't have 30 days volume yet
             var level = tradingFee.Levels.OrderBy(x => x.Volume).First();
@@ -114,7 +115,8 @@ namespace Operations.DomainService
             {
                 Size = size.ToString(CultureInfo.InvariantCulture),
                 SizeType = (int)FeeSizeType.Percentage,
-                TargetWalletId = (ulong?)feeWallet,
+                TargetAccountId = (ulong)feeAccountId,
+                TargetWalletId = (ulong?)feeWalletId,
                 Type = feeType
             };
 
@@ -132,7 +134,7 @@ namespace Operations.DomainService
             catch (Exception e)
             {
                 _logger.LogWarning(e, "Something went wrong while requesting TradingFee. The fee is set to 0. " +
-                                      "BrokerId={$BrokerId}; AssetPair={$AssetPair}", brokerId, assetPair);
+                                      "BrokerId={@BrokerId}; AssetPair={@AssetPair}", brokerId, assetPair);
 
                 return null;
             }
@@ -149,7 +151,7 @@ namespace Operations.DomainService
             catch (Exception e)
             {
                 _logger.LogWarning(e, "Something went wrong while requesting broker FeesSettings. The fee is set to 0. " +
-                                      "BrokerId={$BrokerId}", brokerId);
+                                      "BrokerId={@BrokerId}", brokerId);
 
                 return null;
             }

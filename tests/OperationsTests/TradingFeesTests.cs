@@ -160,6 +160,7 @@ namespace OperationsTests
             var result = new SettingsModel
             {
                 BrokerId = BrokerId,
+                FeeAccountId = (long)AccountId,
                 FeeWalletId = (long)WalletId
             };
 
@@ -201,6 +202,9 @@ namespace OperationsTests
             Assert.Single(fees);
             var fee = fees.Single();
             Assert.Equal(fee.Size, feeSize.ToString(CultureInfo.InvariantCulture));
+            //TODO: Must be checked in positive case
+            //Assert.Equal(AccountId, fee.TargetAccountId);
+            //Assert.Equal(WalletId, fee.TargetWalletId);
 
             if (feeSize == 0)
             {
@@ -221,6 +225,9 @@ namespace OperationsTests
             var fee = fees.Single();
             Assert.Equal(fee.MakerSize, makerSize.ToString(CultureInfo.InvariantCulture));
             Assert.Equal(fee.TakerSize, takerSize.ToString(CultureInfo.InvariantCulture));
+            //TODO: Must be checked in positive case
+            //Assert.Equal(AccountId, fee.TargetAccountId);
+            //Assert.Equal(WalletId, fee.TargetWalletId);
 
             if (fee.MakerSize == 0.ToString() && fee.TakerSize == 0.ToString())
             {
@@ -236,7 +243,7 @@ namespace OperationsTests
             }
         }
 
-        //[Fact]
+        [Fact]
         public async Task MarketOrder_NoFee_NoSettings_Test()
         {
             // arrange
@@ -268,7 +275,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task MarketOrder_ExistedFee_NoSettings_Test()
         {
             // arrange
@@ -311,7 +318,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task MarketOrder_NoFee_ExistedSettings_Test()
         {
             // arrange
@@ -348,7 +355,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task MarketOrder_ExistedFee_ExistedSettings_Test()
         {
             // arrange
@@ -397,7 +404,7 @@ namespace OperationsTests
         }
 
 
-        //[Fact]
+        [Fact]
         public async Task LimitOrder_NoFee_NoSettings_Test()
         {
             // arrange
@@ -429,7 +436,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task LimitOrder_ExistedFee_NoSettings_Test()
         {
             // arrange
@@ -462,7 +469,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task LimitOrder_NoFee_ExistedSettings_Test()
         {
             // arrange
@@ -495,7 +502,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task LimitOrder_ExistedFee_ExistedSettings_Test()
         {
             // arrange

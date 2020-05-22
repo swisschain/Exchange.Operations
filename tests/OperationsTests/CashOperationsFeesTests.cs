@@ -170,6 +170,7 @@ namespace OperationsTests
             var result = new SettingsModel
             {
                 BrokerId = BrokerId,
+                FeeAccountId = (long)AccountId,
                 FeeWalletId = (long)WalletId
             };
 
@@ -207,6 +208,9 @@ namespace OperationsTests
             Assert.Single(fees);
             var fee = fees.Single();
             Assert.Equal(fee.Size, feeSize.ToString(CultureInfo.InvariantCulture));
+            //TODO: Must be checked in positive case
+            //Assert.Equal(AccountId, fee.TargetAccountId);
+            //Assert.Equal(ToWalletId, fee.TargetWalletId);
 
             if (feeSize == 0)
             {
@@ -227,7 +231,7 @@ namespace OperationsTests
             Transfer = 2
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashIn_NoFee_NoSettings_Test()
         {
             // arrange
@@ -259,7 +263,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashIn_ExistedFee_NoSettings_Test()
         {
             // arrange
@@ -292,7 +296,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashIn_NoFee_ExistedSettings_Test()
         {
             // arrange
@@ -325,7 +329,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashIn_ExistedFee_ExistedSettings_Test()
         {
             // arrange
@@ -360,7 +364,7 @@ namespace OperationsTests
         }
 
 
-        //[Fact]
+        [Fact]
         public async Task CashOut_NoFee_NoSettings_Test()
         {
             // arrange
@@ -392,7 +396,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashOut_ExistedFee_NoSettings_Test()
         {
             // arrange
@@ -425,7 +429,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashOut_NoFee_ExistedSettings_Test()
         {
             // arrange
@@ -458,7 +462,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashOut_ExistedFee_ExistedSettings_Test()
         {
             // arrange
@@ -492,7 +496,7 @@ namespace OperationsTests
             Assert.Equal(1, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashOut_ExistedFee_ExistedSettings_PositiveVolumeToNegative_Test()
         {
             // arrange
@@ -528,7 +532,7 @@ namespace OperationsTests
         }
 
 
-        //[Fact]
+        [Fact]
         public async Task CashTransfer_NoFee_NoSettings_Test()
         {
             // arrange
@@ -560,7 +564,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashTransfer_ExistedFee_NoSettings_Test()
         {
             // arrange
@@ -593,7 +597,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashTransfer_NoFee_ExistedSettings_Test()
         {
             // arrange
@@ -626,7 +630,7 @@ namespace OperationsTests
             Assert.Equal(2, assertCalls.Count);
         }
 
-        //[Fact]
+        [Fact]
         public async Task CashTransfer_ExistedFee_ExistedSettings_Test()
         {
             // arrange
