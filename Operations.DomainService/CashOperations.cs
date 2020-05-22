@@ -56,9 +56,9 @@ namespace Operations.DomainService
                 Description = model.Description
             };
 
-            var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashIn);
+            //var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashIn);
 
-            request.Fees.Add(fee);
+            //request.Fees.Add(fee);
 
             var result = await _matchingEngineClient.CashOperations.CashInOutAsync(request);
 
@@ -85,9 +85,9 @@ namespace Operations.DomainService
                 Description = model.Description
             };
 
-            var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashOut);
+            //var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.CashOut);
 
-            request.Fees.Add(fee);
+            //request.Fees.Add(fee);
 
             var result = await _matchingEngineClient.CashOperations.CashInOutAsync(request);
 
@@ -126,9 +126,9 @@ namespace Operations.DomainService
                 Description = model.Description
             };
 
-            var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.Transfer);
+            //var fee = await GetFeeAsync(brokerId, model.Asset, RequestType.Transfer);
 
-            request.Fees.Add(fee);
+            //request.Fees.Add(fee);
 
             var result = await _matchingEngineClient.CashOperations.CashTransferAsync(request);
 

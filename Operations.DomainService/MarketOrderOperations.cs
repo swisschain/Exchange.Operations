@@ -53,9 +53,9 @@ namespace Operations.DomainService
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
             };
 
-            var fee = await GetFee(brokerId, model.AssetPair);
+            //var fee = await GetFee(brokerId, model.AssetPair);
 
-            request.Fees.Add(fee);
+            //request.Fees.Add(fee);
 
             var response = await _matchingEngineClient.Trading.CreateMarketOrderAsync(request);
 
