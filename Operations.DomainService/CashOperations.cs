@@ -34,16 +34,16 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashInAsync(string brokerId, CashInOutModel model)
         {
-            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
+            //var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
-            if (wallet == null)
-                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+            //if (wallet == null)
+            //    throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
 
-            if (!wallet.IsEnabled)
-                throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
+            //if (!wallet.IsEnabled)
+            //    throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
 
-            if (wallet.Type != WalletType.Main)
-                throw new ArgumentException($"Wallet type must have type '{WalletType.Main}' for deposit / withdrawal operations.");
+            //if (wallet.Type != WalletType.Main)
+            //    throw new ArgumentException($"Wallet type must have type '{WalletType.Main}' for deposit / withdrawal operations.");
 
             var request = new CashInOutOperation
             {
@@ -67,10 +67,10 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashOutAsync(string brokerId, CashInOutModel model)
         {
-            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
+            //var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
-            if (wallet == null)
-                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+            //if (wallet == null)
+            //    throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
 
             var volume = model.Volume >= 0 ? -model.Volume : model.Volume;
 
@@ -96,23 +96,23 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CashTransferAsync(string brokerId, CashTransferModel model)
         {
-            var wallets = await _accountsClient.Wallet.GetAllAsync(new [] { (long)model.FromWalletId, (long)model.ToWalletId }, brokerId);
+            //var wallets = await _accountsClient.Wallet.GetAllAsync(new [] { (long)model.FromWalletId, (long)model.ToWalletId }, brokerId);
 
-            var fromWallet = wallets.SingleOrDefault(x => x.Id == (long)model.FromWalletId);
+            //var fromWallet = wallets.SingleOrDefault(x => x.Id == (long)model.FromWalletId);
 
-            var toWallet = wallets.SingleOrDefault(x => x.Id == (long)model.ToWalletId);
+            //var toWallet = wallets.SingleOrDefault(x => x.Id == (long)model.ToWalletId);
 
-            if (fromWallet == null)
-                throw new ArgumentException($"Source wallet '{model.FromWalletId}' doesn't exist.");
+            //if (fromWallet == null)
+            //    throw new ArgumentException($"Source wallet '{model.FromWalletId}' doesn't exist.");
 
-            if (toWallet == null)
-                throw new ArgumentException($"Target wallet '{model.ToWalletId}' doesn't exist.");
+            //if (toWallet == null)
+            //    throw new ArgumentException($"Target wallet '{model.ToWalletId}' doesn't exist.");
 
-            if (!toWallet.IsEnabled)
-                throw new ArgumentException($"Target wallet '{model.FromWalletId}' is disabled.");
+            //if (!toWallet.IsEnabled)
+            //    throw new ArgumentException($"Target wallet '{model.FromWalletId}' is disabled.");
 
-            if (fromWallet.AccountId != toWallet.AccountId)
-                throw new ArgumentException($"Target and source wallets must have the same account id.");
+            //if (fromWallet.AccountId != toWallet.AccountId)
+            //    throw new ArgumentException($"Target and source wallets must have the same account id.");
 
             var request = new CashTransferOperation
             {

@@ -33,13 +33,13 @@ namespace Operations.DomainService
 
         public async Task<OperationResponse> CreateAsync(string brokerId, LimitOrderCreateModel model)
         {
-            var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
+            //var wallet = await _accountsClient.Wallet.GetAsync((long)model.WalletId, brokerId);
 
-            if (wallet == null)
-                throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
+            //if (wallet == null)
+            //    throw new ArgumentException($"Wallet '{model.WalletId}' does not exist.");
 
-            if (!wallet.IsEnabled)
-                throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
+            //if (!wallet.IsEnabled)
+            //    throw new ArgumentException($"Wallet '{model.WalletId}' is disabled.");
 
             var request = new LimitOrder
             {
